@@ -11,6 +11,7 @@ namespace Synthetic.Entity.Player
 
         private void Awake()
         {
+            Debug.Log("Kernel");
             input = new EssenceInput();
             movement = GetComponent<PlayerMovement>();
         }
