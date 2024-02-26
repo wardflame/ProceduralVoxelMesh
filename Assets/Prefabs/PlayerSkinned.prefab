@@ -9,6 +9,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5825630956923008996}
+  - component: {fileID: 8892263616248104594}
+  - component: {fileID: 723365853268284621}
+  - component: {fileID: 8124672110483789664}
+  - component: {fileID: 3490054508718539433}
   m_Layer: 0
   m_Name: PlayerSkinned
   m_TagString: Untagged
@@ -34,6 +38,81 @@ Transform:
   - {fileID: 7726784007768394517}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!143 &8892263616248104594
+CharacterController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5438632223927305619}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Height: 1.8
+  m_Radius: 0.5
+  m_SlopeLimit: 45
+  m_StepOffset: 0.3
+  m_SkinWidth: 0.08
+  m_MinMoveDistance: 0.001
+  m_Center: {x: 0, y: 0.9, z: 0}
+--- !u!114 &723365853268284621
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5438632223927305619}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d93cbd902644d7d4b87b2096ca4e9108, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cameraMain: {fileID: 0}
+  cameraCMV: {fileID: 0}
+  movement: {fileID: 0}
+  look: {fileID: 0}
+--- !u!114 &8124672110483789664
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5438632223927305619}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a05e8904260cd0941bc4acdce85b7e55, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  kernel: {fileID: 0}
+  controller: {fileID: 0}
+  moveSpeed: 4
+  acceleration: 1
+  deceleration: 0.5
+  currentSpeed: {x: 0, y: 0, z: 0}
+  inertia: 0
+--- !u!114 &3490054508718539433
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5438632223927305619}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1ec496ad40579734ea999885000286df, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  kernel: {fileID: 0}
+  rotationPower: 1
 --- !u!1 &7391256714436150773
 GameObject:
   m_ObjectHideFlags: 0
@@ -63,7 +142,7 @@ Transform:
   m_GameObject: {fileID: 7391256714436150773}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.9, z: 0}
+  m_LocalPosition: {x: 0.03, y: 0.9, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -96,7 +175,7 @@ VisualEffect:
         m_Overridden: 1
       - m_Value: {x: 0.00004297478, y: 0.9353755, z: -0.003354269}
         m_Name: MeshTransform_position
-        m_Overridden: 1
+        m_Overridden: 0
       - m_Value: {x: 1, y: 1, z: 1}
         m_Name: MeshTransform_scale
         m_Overridden: 1

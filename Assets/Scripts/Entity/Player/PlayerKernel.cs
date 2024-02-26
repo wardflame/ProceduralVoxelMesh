@@ -1,19 +1,26 @@
-using System.Collections;
-using System.Collections.Generic;
+using Cinemachine;
 using UnityEngine;
 
-namespace Synthetic.Entity.Player
+namespace Essence.Entity.Player
 {
     public class PlayerKernel : MonoBehaviour
     {
-        public PlayerMovement movement;
         public EssenceInput input;
+
+        public Camera cameraMain;
+        public CinemachineVirtualCamera cameraCMV;
+
+        public PlayerMovement movement;
+        public PlayerLook look;
 
         private void Awake()
         {
             Debug.Log("Kernel");
             input = new EssenceInput();
             movement = GetComponent<PlayerMovement>();
+            look = GetComponent<PlayerLook>();
+
+            input.Enable();
         }
     }
 }

@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Synthetic.Settings
+namespace Essence.Settings
 {
     public class SettingsPlaceholder : MonoBehaviour
     {
