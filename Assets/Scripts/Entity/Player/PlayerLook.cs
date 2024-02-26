@@ -24,6 +24,7 @@ namespace Essence.Entity.Player
 
         private void Update()
         {
+            Debug.DrawRay(kernel.cameraMain.transform.position, kernel.cameraMain.transform.forward * 2, Color.cyan, .1f);
             Look();
         }
 

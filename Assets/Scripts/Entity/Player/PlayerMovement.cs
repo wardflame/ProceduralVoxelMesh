@@ -39,18 +39,22 @@ namespace Essence.Entity.Player
 
         private void MoveCharacter()
         {
+            Vector3 forwardDir = input.z * kernel.cameraMain.transform.forward.normalized;
+            Vector3 rightDir = input.x * kernel.cameraMain.transform.right.normalized;
+            var newDir = forwardDir + rightDir;
+
             if (isMoving)
             {
                 // Inertia: Acceleration
-                if (currentSpeed.magnitude < input.magnitude)
+                if (currentSpeed.magnitude < newDir.magnitude)
                 {
                     inertia += Time.deltaTime * acceleration;
-                    currentSpeed = Vector3.Lerp(currentSpeed, input, inertia);
+                    currentSpeed = Vector3.Lerp(currentSpeed, newDir, inertia);
                 }
                 else
                 {
                     inertia = 1;
-                    currentSpeed = input;
+                    currentSpeed = newDir;
                 }
 
                 controller.SimpleMove(currentSpeed * moveSpeed);
