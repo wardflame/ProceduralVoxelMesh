@@ -20,6 +20,10 @@ namespace Essence.Entity.Player
 
         private bool isMoving;
 
+        private Animator animator;
+        private int animHashVelocityX;
+        private int animHashVelocityY;
+
 
         private void Awake()
         {
@@ -30,6 +34,11 @@ namespace Essence.Entity.Player
             kernel.input.Movement.Move.canceled += OnMove;
 
             controller = GetComponent<CharacterController>();
+
+            animator = GetComponentInChildren<Animator>();
+
+            animHashVelocityX = Animator.StringToHash("VelocityX");
+            animHashVelocityY = Animator.StringToHash("VelocityY");
         }
 
         private void Update()
@@ -77,6 +86,11 @@ namespace Essence.Entity.Player
                     controller.SimpleMove(currentSpeed * moveSpeed);
                 }
             }
+
+            var cSpeed = input * inertia;
+
+            animator.SetFloat(animHashVelocityX, cSpeed.x);
+            animator.SetFloat(animHashVelocityY, cSpeed.z);
         }
 
         private void OnMove(InputAction.CallbackContext value)

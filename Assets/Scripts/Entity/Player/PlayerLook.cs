@@ -1,3 +1,4 @@
+using Cinemachine;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -10,7 +11,13 @@ namespace Essence.Entity.Player
         public PlayerKernel kernel;
 
         public float rotationPower = 1;
+
+        public int angleThresholdBottom = 290;
+        public int angleThresholdTop = 70;
+
         private Vector2 rotation;
+
+        private bool isRotating;
 
         private void Awake()
         {
@@ -24,12 +31,13 @@ namespace Essence.Entity.Player
 
         private void Update()
         {
-            Debug.DrawRay(kernel.cameraMain.transform.position, kernel.cameraMain.transform.forward * 2, Color.cyan, .1f);
             Look();
         }
 
         private void Look()
         {
+            if (!isRotating) return;
+
             transform.rotation *= Quaternion.AngleAxis(rotation.x * rotationPower, Vector3.up);
             kernel.cameraCMV.Follow.transform.rotation *= Quaternion.AngleAxis(-rotation.y * rotationPower, Vector3.right);
 
@@ -38,13 +46,13 @@ namespace Essence.Entity.Player
 
             var angle = kernel.cameraCMV.Follow.transform.localEulerAngles.x;
 
-            if (angle > 180 && angle < 340)
+            if (angle > 180 && angle < angleThresholdBottom)
             {
-                angles.x = 340;
+                angles.x = angleThresholdBottom;
             }
-            else if (angle < 180 && angle > 40)
+            else if (angle < 180 && angle > angleThresholdTop)
             {
-                angles.x = 40;
+                angles.x = angleThresholdTop;
             }
 
             kernel.cameraCMV.Follow.transform.localEulerAngles = angles;
@@ -52,7 +60,8 @@ namespace Essence.Entity.Player
 
         private void OnLook(InputAction.CallbackContext value)
         {
-            rotation = value.ReadValue<Vector2>();
+            rotation = value.ReadValue<Vector2>().normalized;
+            if (rotation.magnitude > 0) isRotating = true;
         }
     }
 }
