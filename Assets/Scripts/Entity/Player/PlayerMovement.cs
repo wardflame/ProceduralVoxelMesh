@@ -48,9 +48,9 @@ namespace Essence.Entity.Player
 
         private void MoveCharacter()
         {
-            Vector3 forwardDir = input.z * kernel.cameraMain.transform.forward.normalized;
-            Vector3 rightDir = input.x * kernel.cameraMain.transform.right.normalized;
-            var newDir = forwardDir + rightDir;
+            Vector3 forwardDir = input.z * kernel.cameraMain.transform.forward;
+            Vector3 rightDir = input.x * kernel.cameraMain.transform.right;
+            var newDir = (forwardDir + rightDir).normalized;
 
             if (isMoving)
             {

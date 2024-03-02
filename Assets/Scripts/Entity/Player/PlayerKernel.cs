@@ -12,6 +12,7 @@ namespace Essence.Entity.Player
 
         public PlayerMovement movement;
         public PlayerLook look;
+        public PlayerAimTarget aimTarget;
 
         private void Awake()
         {
@@ -19,6 +20,7 @@ namespace Essence.Entity.Player
             input = new EssenceInput();
             movement = GetComponent<PlayerMovement>();
             look = GetComponent<PlayerLook>();
+            aimTarget = GetComponent<PlayerAimTarget>();
 
             input.Enable();
         }

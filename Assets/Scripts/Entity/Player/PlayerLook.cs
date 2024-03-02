@@ -11,13 +11,17 @@ namespace Essence.Entity.Player
         public PlayerKernel kernel;
 
         public float rotationPower = 1;
+        private float rotationPowerCoefficient = 100;
 
         public int angleThresholdBottom = 290;
         public int angleThresholdTop = 70;
 
-        private Vector2 rotation;
+        private Vector2 rotationNorm;
 
         private bool isRotating;
+
+        private float rotX;
+        private float rotY;
 
         private void Awake()
         {
@@ -38,30 +42,57 @@ namespace Essence.Entity.Player
         {
             if (!isRotating) return;
 
-            transform.rotation *= Quaternion.AngleAxis(rotation.x * rotationPower, Vector3.up);
-            kernel.cameraCMV.Follow.transform.rotation *= Quaternion.AngleAxis(-rotation.y * rotationPower, Vector3.right);
+            rotY += rotValue.x * Time.deltaTime * lookSensitivity;
+            rotX -= rotValue.y * Time.deltaTime * (lookSensitivity / 2);
 
-            var angles = kernel.cameraCMV.Follow.transform.localEulerAngles;
-            angles.z = 0;
+            rotX = Mathf.Clamp(rotX, -90f, 90f);
 
-            var angle = kernel.cameraCMV.Follow.transform.localEulerAngles.x;
+            playerManager.playerTransform.rotation = Quaternion.Euler(0, rotY, 0);
+            cameraTarget.rotation = Quaternion.Euler(rotX, rotY, 0);
 
-            if (angle > 180 && angle < angleThresholdBottom)
+            #region Rotate Player
+            var qX = Quaternion.AngleAxis(rotationNorm.x * rotationPower * Time.deltaTime, Vector3.up);
+
+            var rot = transform.rotation;
+            var rotQ = rot * qX;
+
+            transform.rotation = Quaternion.Slerp(rot, rotQ, 0.1f);
+            #endregion Rotate Player
+
+            #region Rotate VCam Look Target
+            var qY = Quaternion.AngleAxis(rotationNorm.y * rotationPower * Time.deltaTime, Vector3.right);
+
+            var kernelVCam = kernel.cameraCMV;
+            var kVCamRot = kernelVCam.Follow.transform.rotation;
+
+            var kVCamRotQ = kVCamRot * Quaternion.Inverse(qY);
+
+            kernel.cameraCMV.Follow.transform.rotation = Quaternion.Slerp(kVCamRot, kVCamRotQ, 0.1f);
+            #endregion Rotate VCam Look Target
+
+            #region Restrict Camera Angles
+            var vCamEuler = kernelVCam.Follow.transform.localEulerAngles;
+            vCamEuler.z = 0;
+
+            var vCamEulerX = vCamEuler.x;
+
+            if (vCamEulerX > 180 && vCamEulerX < angleThresholdBottom)
             {
-                angles.x = angleThresholdBottom;
+                vCamEuler.x = angleThresholdBottom;
             }
-            else if (angle < 180 && angle > angleThresholdTop)
+            else if (vCamEulerX < 180 && vCamEulerX > angleThresholdTop)
             {
-                angles.x = angleThresholdTop;
+                vCamEuler.x = angleThresholdTop;
             }
 
-            kernel.cameraCMV.Follow.transform.localEulerAngles = angles;
+            kernel.cameraCMV.Follow.localEulerAngles = vCamEuler;
+            #endregion Restrict Camera Angles
         }
 
         private void OnLook(InputAction.CallbackContext value)
         {
-            rotation = value.ReadValue<Vector2>().normalized;
-            if (rotation.magnitude > 0) isRotating = true;
+            rotationNorm = value.ReadValue<Vector2>().normalized;
+            isRotating = rotationNorm.magnitude > 0;
         }
     }
 }
