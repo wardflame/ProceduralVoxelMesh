@@ -7,10 +7,10 @@ namespace Essence.Entity.Player
         public PlayerKernel kernel;
         private Transform mainCamTrans;
 
-        public Transform aimTarget;
+        public Transform targetTransform;
 
+        public LayerMask hitLayers;
         [SerializeField] private float rayDistance = 200;
-        [SerializeField] private LayerMask hitLayers;
 
         [SerializeField] private float smoothTime = 0.1f;
 
@@ -33,13 +33,13 @@ namespace Essence.Entity.Player
         {
             if (Physics.Raycast(kernel.cameraMain.transform.position, kernel.cameraMain.transform.forward, out RaycastHit hit, rayDistance, hitLayers))
             {
-                var currentPos = aimTarget.position;
-                aimTarget.position = Vector3.SmoothDamp(currentPos, hit.point, ref velocity, smoothTime);
+                var currentPos = targetTransform.position;
+                targetTransform.position = Vector3.SmoothDamp(currentPos, hit.point, ref velocity, smoothTime);
             }
             else
             {
-                var currentPos = aimTarget.position;
-                aimTarget.position = Vector3.SmoothDamp(currentPos, mainCamTrans.forward * rayDistance, ref velocity, smoothTime);
+                var currentPos = targetTransform.position;
+                targetTransform.position = Vector3.SmoothDamp(currentPos, mainCamTrans.forward * rayDistance, ref velocity, smoothTime);
             }
         }
     }

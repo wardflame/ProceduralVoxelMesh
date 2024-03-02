@@ -1,5 +1,6 @@
 using Cinemachine;
 using UnityEngine;
+using Essence.Weapons;
 
 namespace Essence.Entity.Player
 {
@@ -14,6 +15,8 @@ namespace Essence.Entity.Player
         public PlayerLook look;
         public PlayerAimTarget aimTarget;
 
+        public Weapon currentWeapon;
+
         private void Awake()
         {
             Debug.Log("Kernel");
@@ -21,6 +24,7 @@ namespace Essence.Entity.Player
             movement = GetComponent<PlayerMovement>();
             look = GetComponent<PlayerLook>();
             aimTarget = GetComponent<PlayerAimTarget>();
+            currentWeapon = GetComponentInChildren<Weapon>();
 
             input.Enable();
         }
