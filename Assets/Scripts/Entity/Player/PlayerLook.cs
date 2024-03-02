@@ -1,6 +1,3 @@
-using Cinemachine;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -10,18 +7,23 @@ namespace Essence.Entity.Player
     {
         public PlayerKernel kernel;
 
-        public float rotationPower = 1;
+        public float lookSensitivity = 1;
         private float rotationPowerCoefficient = 100;
+        private float rotationPower => lookSensitivity * rotationPowerCoefficient;
 
         public int angleThresholdBottom = 290;
         public int angleThresholdTop = 70;
 
-        private Vector2 rotationNorm;
-
-        private bool isRotating;
+        private Vector2 lookInput;
 
         private float rotX;
         private float rotY;
+
+        public float smoothTime = 0.1f;
+        private float velocityY;
+        private float velocityX;
+
+        private bool isLooking;
 
         private void Awake()
         {
@@ -29,70 +31,47 @@ namespace Essence.Entity.Player
 
             kernel = GetComponent<PlayerKernel>();
 
-            kernel.input.Movement.Look.performed += OnLook;
-            kernel.input.Movement.Look.canceled += OnLook;
+            kernel.input.Movement.Look.performed += OnLookPerformed;
+            kernel.input.Movement.Look.canceled += OnLookCanceled;
+
+            rotX = transform.localEulerAngles.x;
+            rotY = transform.localEulerAngles.y;
         }
 
         private void Update()
         {
-            Look();
+            if (isLooking) RotatePlayer();
         }
 
-        private void Look()
+        private void RotatePlayer()
         {
-            if (!isRotating) return;
+            lookInput = kernel.input.Movement.Look.ReadValue<Vector2>();
 
-            rotY += rotValue.x * Time.deltaTime * lookSensitivity;
-            rotX -= rotValue.y * Time.deltaTime * (lookSensitivity / 2);
+            Debug.Log(lookInput);
+
+            var newRotY = rotY + lookInput.x * Time.deltaTime * rotationPower;
+            var newRotX = rotX - lookInput.y * Time.deltaTime * (rotationPower / 2);
+
+            rotY = Mathf.SmoothDamp(rotY, newRotY, ref velocityY, smoothTime);
+            rotX = Mathf.SmoothDamp(rotX, newRotX, ref velocityX, smoothTime);
+
+            /*rotY += rotationNorm.x * Time.deltaTime * rotationPower;
+            rotX -= rotationNorm.y * Time.deltaTime * (rotationPower / 2);*/
 
             rotX = Mathf.Clamp(rotX, -90f, 90f);
 
-            playerManager.playerTransform.rotation = Quaternion.Euler(0, rotY, 0);
-            cameraTarget.rotation = Quaternion.Euler(rotX, rotY, 0);
-
-            #region Rotate Player
-            var qX = Quaternion.AngleAxis(rotationNorm.x * rotationPower * Time.deltaTime, Vector3.up);
-
-            var rot = transform.rotation;
-            var rotQ = rot * qX;
-
-            transform.rotation = Quaternion.Slerp(rot, rotQ, 0.1f);
-            #endregion Rotate Player
-
-            #region Rotate VCam Look Target
-            var qY = Quaternion.AngleAxis(rotationNorm.y * rotationPower * Time.deltaTime, Vector3.right);
-
-            var kernelVCam = kernel.cameraCMV;
-            var kVCamRot = kernelVCam.Follow.transform.rotation;
-
-            var kVCamRotQ = kVCamRot * Quaternion.Inverse(qY);
-
-            kernel.cameraCMV.Follow.transform.rotation = Quaternion.Slerp(kVCamRot, kVCamRotQ, 0.1f);
-            #endregion Rotate VCam Look Target
-
-            #region Restrict Camera Angles
-            var vCamEuler = kernelVCam.Follow.transform.localEulerAngles;
-            vCamEuler.z = 0;
-
-            var vCamEulerX = vCamEuler.x;
-
-            if (vCamEulerX > 180 && vCamEulerX < angleThresholdBottom)
-            {
-                vCamEuler.x = angleThresholdBottom;
-            }
-            else if (vCamEulerX < 180 && vCamEulerX > angleThresholdTop)
-            {
-                vCamEuler.x = angleThresholdTop;
-            }
-
-            kernel.cameraCMV.Follow.localEulerAngles = vCamEuler;
-            #endregion Restrict Camera Angles
+            transform.rotation = Quaternion.Euler(0, rotY, 0);
+            kernel.cameraCMV.Follow.rotation = Quaternion.Euler(rotX, rotY, 0);
         }
 
-        private void OnLook(InputAction.CallbackContext value)
+        private void OnLookPerformed(InputAction.CallbackContext value)
         {
-            rotationNorm = value.ReadValue<Vector2>().normalized;
-            isRotating = rotationNorm.magnitude > 0;
+            isLooking = true;
+        }
+
+        private void OnLookCanceled(InputAction.CallbackContext value)
+        {
+            isLooking = false;
         }
     }
 }

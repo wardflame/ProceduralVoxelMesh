@@ -1,9 +1,6 @@
-using Essence.Entity.Player;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-namespace Essence
+namespace Essence.Entity.Player
 {
     public class PlayerAimTarget : MonoBehaviour
     {
@@ -21,11 +18,13 @@ namespace Essence
 
         private void Awake()
         {
+            Debug.Log("Aim Target");
+
             kernel = GetComponent<PlayerKernel>();
             mainCamTrans = kernel.cameraMain.transform;
         }
 
-        private void Update()
+        private void FixedUpdate()
         {
             SeekAimTargetCollision();
         }
