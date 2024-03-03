@@ -156,7 +156,7 @@ public partial class @EssenceInput: IInputActionCollection2, IDisposable
             ]
         },
         {
-            ""name"": ""Shooting"",
+            ""name"": ""Combat"",
             ""id"": ""f986ee29-5c77-4bd5-a21e-c29a4302bad8"",
             ""actions"": [
                 {
@@ -423,10 +423,10 @@ public partial class @EssenceInput: IInputActionCollection2, IDisposable
         m_Movement_Crouch = m_Movement.FindAction("Crouch", throwIfNotFound: true);
         m_Movement_Jump = m_Movement.FindAction("Jump", throwIfNotFound: true);
         m_Movement_Look = m_Movement.FindAction("Look", throwIfNotFound: true);
-        // Shooting
-        m_Shooting = asset.FindActionMap("Shooting", throwIfNotFound: true);
-        m_Shooting_Fire = m_Shooting.FindAction("Fire", throwIfNotFound: true);
-        m_Shooting_Aim = m_Shooting.FindAction("Aim", throwIfNotFound: true);
+        // Combat
+        m_Combat = asset.FindActionMap("Combat", throwIfNotFound: true);
+        m_Combat_Fire = m_Combat.FindAction("Fire", throwIfNotFound: true);
+        m_Combat_Aim = m_Combat.FindAction("Aim", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -560,26 +560,26 @@ public partial class @EssenceInput: IInputActionCollection2, IDisposable
     }
     public MovementActions @Movement => new MovementActions(this);
 
-    // Shooting
-    private readonly InputActionMap m_Shooting;
-    private List<IShootingActions> m_ShootingActionsCallbackInterfaces = new List<IShootingActions>();
-    private readonly InputAction m_Shooting_Fire;
-    private readonly InputAction m_Shooting_Aim;
-    public struct ShootingActions
+    // Combat
+    private readonly InputActionMap m_Combat;
+    private List<ICombatActions> m_CombatActionsCallbackInterfaces = new List<ICombatActions>();
+    private readonly InputAction m_Combat_Fire;
+    private readonly InputAction m_Combat_Aim;
+    public struct CombatActions
     {
         private @EssenceInput m_Wrapper;
-        public ShootingActions(@EssenceInput wrapper) { m_Wrapper = wrapper; }
-        public InputAction @Fire => m_Wrapper.m_Shooting_Fire;
-        public InputAction @Aim => m_Wrapper.m_Shooting_Aim;
-        public InputActionMap Get() { return m_Wrapper.m_Shooting; }
+        public CombatActions(@EssenceInput wrapper) { m_Wrapper = wrapper; }
+        public InputAction @Fire => m_Wrapper.m_Combat_Fire;
+        public InputAction @Aim => m_Wrapper.m_Combat_Aim;
+        public InputActionMap Get() { return m_Wrapper.m_Combat; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
         public bool enabled => Get().enabled;
-        public static implicit operator InputActionMap(ShootingActions set) { return set.Get(); }
-        public void AddCallbacks(IShootingActions instance)
+        public static implicit operator InputActionMap(CombatActions set) { return set.Get(); }
+        public void AddCallbacks(ICombatActions instance)
         {
-            if (instance == null || m_Wrapper.m_ShootingActionsCallbackInterfaces.Contains(instance)) return;
-            m_Wrapper.m_ShootingActionsCallbackInterfaces.Add(instance);
+            if (instance == null || m_Wrapper.m_CombatActionsCallbackInterfaces.Contains(instance)) return;
+            m_Wrapper.m_CombatActionsCallbackInterfaces.Add(instance);
             @Fire.started += instance.OnFire;
             @Fire.performed += instance.OnFire;
             @Fire.canceled += instance.OnFire;
@@ -588,7 +588,7 @@ public partial class @EssenceInput: IInputActionCollection2, IDisposable
             @Aim.canceled += instance.OnAim;
         }
 
-        private void UnregisterCallbacks(IShootingActions instance)
+        private void UnregisterCallbacks(ICombatActions instance)
         {
             @Fire.started -= instance.OnFire;
             @Fire.performed -= instance.OnFire;
@@ -598,21 +598,21 @@ public partial class @EssenceInput: IInputActionCollection2, IDisposable
             @Aim.canceled -= instance.OnAim;
         }
 
-        public void RemoveCallbacks(IShootingActions instance)
+        public void RemoveCallbacks(ICombatActions instance)
         {
-            if (m_Wrapper.m_ShootingActionsCallbackInterfaces.Remove(instance))
+            if (m_Wrapper.m_CombatActionsCallbackInterfaces.Remove(instance))
                 UnregisterCallbacks(instance);
         }
 
-        public void SetCallbacks(IShootingActions instance)
+        public void SetCallbacks(ICombatActions instance)
         {
-            foreach (var item in m_Wrapper.m_ShootingActionsCallbackInterfaces)
+            foreach (var item in m_Wrapper.m_CombatActionsCallbackInterfaces)
                 UnregisterCallbacks(item);
-            m_Wrapper.m_ShootingActionsCallbackInterfaces.Clear();
+            m_Wrapper.m_CombatActionsCallbackInterfaces.Clear();
             AddCallbacks(instance);
         }
     }
-    public ShootingActions @Shooting => new ShootingActions(this);
+    public CombatActions @Combat => new CombatActions(this);
 
     // UI
     private readonly InputActionMap m_UI;
@@ -682,7 +682,7 @@ public partial class @EssenceInput: IInputActionCollection2, IDisposable
         void OnJump(InputAction.CallbackContext context);
         void OnLook(InputAction.CallbackContext context);
     }
-    public interface IShootingActions
+    public interface ICombatActions
     {
         void OnFire(InputAction.CallbackContext context);
         void OnAim(InputAction.CallbackContext context);
