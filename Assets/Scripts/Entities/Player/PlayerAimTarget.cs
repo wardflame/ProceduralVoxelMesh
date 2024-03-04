@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Essence.Entity.Player
+namespace Essence.Entities.Player
 {
     public class PlayerAimTarget : MonoBehaviour
     {

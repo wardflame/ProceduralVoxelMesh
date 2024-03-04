@@ -1,3 +1,5 @@
+using Essence.Entities;
+using Essence.Entities.Player;
 using System.Collections;
 using System.Collections.Generic;
 using System.Net;
@@ -9,60 +11,86 @@ namespace Essence.Weapons
     {
         private const float FORCE_GRAVITY = 9.8f;
 
+        public float damage;
+
         public float velocity;
         public float lifetime;
 
         private Vector3 startPosition;
         private Vector3 startForward;
 
-        private bool isInitialised;
-        private float startTime = -1;
+        private Vector3 previousPosition;
+        private Vector3 currentPosition;
 
-        public void Initialise(Transform startPosition)
+        private float timer;
+
+        private bool hasHit;
+
+        private void Awake()
         {
-            this.startPosition = startPosition.position;
-            startForward = startPosition.forward.normalized;
-            isInitialised = true;
+            startPosition = transform.position;
+            startForward = transform.forward;
+
+            currentPosition = startPosition;
+            previousPosition = startPosition;
         }
 
         private void FixedUpdate()
         {
-            if (!isInitialised) return;
+            timer += Time.fixedDeltaTime;
 
-            if (startTime < 0) startTime = Time.time;
+            if (timer > lifetime) Destroy(gameObject);
 
-            RaycastHit hit;
-            float currentTime = Time.time - startTime;
-            float nextTime = currentTime + Time.fixedDeltaTime;
+            currentPosition = FindVectorOnParabola();
 
-            Vector3 currentPoint = FindVectorOnParabola(currentTime);
-            Vector3 nextPoint = FindVectorOnParabola(nextTime);
+            transform.position = currentPosition;
 
-            if (RaycastBetweenVectors(currentPoint, nextPoint, out hit))
+            if (previousPosition != currentPosition)
             {
-                
+                if (RaycastBetweenVectors(previousPosition, currentPosition, out RaycastHit previousHit))
+                {
+                    Debug.Log("HIT CURRENT!");
+                    OnHit(previousHit);
+                }
             }
+
+            if (hasHit) return;
+
+            if (RaycastBetweenVectors(previousPosition, currentPosition, out RaycastHit currentHit))
+            {
+                Debug.Log("HIT PREVIOUS!");
+                OnHit(currentHit);
+            }
+
+            previousPosition = currentPosition;
         }
 
-        private void Update()
+        private Vector3 FindVectorOnParabola()
         {
-            if (!isInitialised) return;
-
-            float currentTime = Time.time - startTime;
-            Vector3 currentPoint = FindVectorOnParabola(currentTime);
-            transform.position = currentPoint;
-        }
-
-        private Vector3 FindVectorOnParabola(float time)
-        {
-            Vector3 point = startPosition + (startForward * velocity * time);
-            Vector3 gravityVector = Vector3.down * FORCE_GRAVITY * time * time;
+            Vector3 point = startPosition + (velocity * timer * startForward);
+            Vector3 gravityVector = FORCE_GRAVITY * timer * timer * Vector3.down;
             return point + gravityVector;
         }
 
         private bool RaycastBetweenVectors(Vector3 startVector, Vector3 endVector, out RaycastHit hit)
         {
+            Debug.DrawRay(startVector, endVector - startVector, Color.green, 5);
             return Physics.Raycast(startVector, endVector - startVector, out hit, (endVector - startVector).magnitude);
+        }
+
+        private void OnHit(RaycastHit hit)
+        {
+            hasHit = true;
+
+            transform.position = hit.point;
+
+            Entity entity = hit.collider.gameObject.GetComponentInParent<Entity>();
+
+            if (entity) entity.DamageHealth(damage);
+
+            // FX COROUTINE
+
+            Destroy(gameObject);
         }
     }
 }

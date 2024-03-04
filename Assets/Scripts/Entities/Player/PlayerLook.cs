@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-namespace Essence.Entity.Player
+namespace Essence.Entities.Player
 {
     public class PlayerLook : MonoBehaviour
     {

@@ -1,4 +1,4 @@
-using Essence.Entity.Player;
+using Essence.Entities.Player;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -19,16 +19,22 @@ namespace Essence.Weapons
             kernel.currentWeapon = this;
 
             kernel.input.Combat.Fire.performed += OnFirePerformed;
+
+            //StartCoroutine(DistanceTick());
+        }
+
+        private IEnumerator DistanceTick()
+        {
+            while (true)
+            {
+                Debug.Log("Distance = " + Vector3.Distance(firePoint.position, kernel.aimTarget.targetTransform.position));
+                yield return new WaitForSeconds(1);
+            }
         }
 
         private void OnFirePerformed(InputAction.CallbackContext value)
         {
-            var bullet = Instantiate(ammoPrefab, firePoint.position, firePoint.rotation);
-            var projectile = bullet.GetComponent<Projectile>();
-
-            if (projectile) projectile.Initialise(firePoint);
-
-            Destroy(bullet, projectile.lifetime);
+            Instantiate(ammoPrefab, firePoint.position, firePoint.rotation);
         }
     }
 }

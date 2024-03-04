@@ -45,6 +45,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7fdc07737bc979348881787a1fe8b0ee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  damage: 2
   velocity: 300
   lifetime: 1
 --- !u!1 &6215910417208996513
@@ -58,7 +59,7 @@ GameObject:
   - component: {fileID: 8530187935286601586}
   - component: {fileID: 4204048433827306327}
   - component: {fileID: 3515111181431091362}
-  - component: {fileID: 8448976449137933653}
+  - component: {fileID: 1446673461171829403}
   m_Layer: 0
   m_Name: Sphere
   m_TagString: Untagged
@@ -76,7 +77,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.05, y: 0.05, z: 0.1}
+  m_LocalScale: {x: 0.013, y: 0.013, z: 0.02}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 540248734007025291}
@@ -131,7 +132,7 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!96 &8448976449137933653
+--- !u!96 &1446673461171829403
 TrailRenderer:
   serializedVersion: 3
   m_ObjectHideFlags: 0
@@ -177,7 +178,7 @@ TrailRenderer:
   m_PreviewTimeScale: 1
   m_Parameters:
     serializedVersion: 3
-    widthMultiplier: 0.02
+    widthMultiplier: 0.01
     widthCurve:
       serializedVersion: 2
       m_Curve:
@@ -239,7 +240,7 @@ TrailRenderer:
     textureScale: {x: 1, y: 1}
     shadowBias: 0.5
     generateLightingData: 0
-  m_MinVertexDistance: 0.02
+  m_MinVertexDistance: 0.1
   m_MaskInteraction: 0
   m_Autodestruct: 0
   m_Emitting: 1

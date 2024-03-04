@@ -2,7 +2,7 @@ using Cinemachine;
 using UnityEngine;
 using Essence.Weapons;
 
-namespace Essence.Entity.Player
+namespace Essence.Entities.Player
 {
     public class PlayerKernel : MonoBehaviour
     {

@@ -1,4 +1,4 @@
-using Essence.Entity.Player;
+using Essence.Entities.Player;
 using UnityEngine;
 
 namespace Essence.UI.Player
