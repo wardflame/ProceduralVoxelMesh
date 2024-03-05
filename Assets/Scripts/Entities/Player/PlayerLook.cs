@@ -29,6 +29,9 @@ namespace Essence.Entities.Player
         {
             Debug.Log("Look");
 
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+
             kernel = GetComponent<PlayerKernel>();
 
             kernel.input.Movement.Look.performed += OnLookPerformed;
