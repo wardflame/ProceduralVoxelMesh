@@ -31,6 +31,8 @@ namespace Essence.UI.Player
                     firePoint.forward
                 );
 
+            Debug.DrawRay(firePoint.position, firePoint.forward * 5, Color.blue);
+
             Vector3 screenPoint;
 
             if (Physics.Raycast(firepointRay, out RaycastHit hit, 999f, hud.player.aimTarget.hitLayers))

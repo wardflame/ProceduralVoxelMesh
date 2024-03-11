@@ -13,6 +13,8 @@ namespace Essence.Weapons
 
         public float damage;
 
+        public float impactRadius = 0.25f;
+
         public float velocity;
         public float lifetime;
 
@@ -26,6 +28,8 @@ namespace Essence.Weapons
 
         private bool hasHit;
 
+        private int environmentLayer;
+
         private void Awake()
         {
             startPosition = transform.position;
@@ -36,6 +40,11 @@ namespace Essence.Weapons
         }
 
         private void FixedUpdate()
+        {
+            if (!hasHit) MoveProjectile();
+        }
+
+        private void MoveProjectile()
         {
             timer += Time.fixedDeltaTime;
 
@@ -84,11 +93,33 @@ namespace Essence.Weapons
 
             transform.position = hit.point;
 
-            Entity entity = hit.collider.gameObject.GetComponentInParent<Entity>();
+            // Environment check
+            if (hit.collider.gameObject.layer == LayerManager.INT_VOXEL)
+            {
+                var voxels = Physics.OverlapSphere(transform.position, impactRadius, LayerMask.GetMask("Voxel"));
 
+                if (voxels.Length > 0)
+                {
+                    foreach (var voxel in voxels)
+                    {
+                        voxel.attachedRigidbody.isKinematic = false;
+                        voxel.attachedRigidbody.AddForce(transform.forward * 2, ForceMode.Impulse);
+                    }
+                }
+            }
+
+            // Entity check
+            Entity entity = hit.collider.gameObject.GetComponentInParent<Entity>();
             if (entity) entity.DamageHealth(damage);
 
             // FX COROUTINE
+
+            StartCoroutine(DestroyProjectile());
+        }
+
+        private IEnumerator DestroyProjectile()
+        {
+            yield return new WaitForSeconds(.025f);
 
             Destroy(gameObject);
         }

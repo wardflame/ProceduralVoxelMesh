@@ -9,11 +9,11 @@ namespace Essence.Voxel
         public float halfSize = 0.1f;
         public Vector3 localOrigin;
 
-        public SkinnedMeshRenderer skinnedMesh;
+        public MeshRenderer meshRenderer;
 
         private void Start()
         {
-            skinnedMesh = GetComponent<SkinnedMeshRenderer>();
+            meshRenderer = GetComponent<MeshRenderer>();
             VoxelizeMesh();
         }
 
@@ -33,7 +33,7 @@ namespace Essence.Voxel
 
         public void VoxelizeMesh()
         {
-            Bounds bounds = skinnedMesh.bounds;
+            Bounds bounds = meshRenderer.bounds;
             Vector3 minExtents = bounds.center - bounds.extents;
             Vector3 count = bounds.extents / halfSize;
 
