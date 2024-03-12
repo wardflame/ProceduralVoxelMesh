@@ -14,6 +14,7 @@ namespace Essence.Weapons
         public float damage;
 
         public float impactRadius = 0.25f;
+        public float impaceForce = 1f;
 
         public float velocity;
         public float lifetime;
@@ -103,7 +104,10 @@ namespace Essence.Weapons
                     foreach (var voxel in voxels)
                     {
                         voxel.attachedRigidbody.isKinematic = false;
-                        voxel.attachedRigidbody.AddForce(transform.forward * 2, ForceMode.Impulse);
+                        var force = Vector3.Reflect((currentPosition - hit.point).normalized, hit.normal) * impaceForce;
+                        Debug.DrawRay(hit.point, force, Color.magenta, 2);
+                        voxel.attachedRigidbody.AddForce(force, ForceMode.Impulse);
+                        Destroy(voxel.gameObject, 1);
                     }
                 }
             }

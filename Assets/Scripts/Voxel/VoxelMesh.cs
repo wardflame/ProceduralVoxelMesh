@@ -9,11 +9,13 @@ namespace Essence.Voxel
         public float halfSize = 0.1f;
         public Vector3 localOrigin;
 
-        public MeshRenderer meshRenderer;
+        public Renderer meshRenderer;
+
+        public Bounds b;
 
         private void Start()
         {
-            meshRenderer = GetComponent<MeshRenderer>();
+            meshRenderer = GetComponent<Renderer>();
             VoxelizeMesh();
         }
 
@@ -23,9 +25,9 @@ namespace Essence.Voxel
             Vector3 position =
                 new Vector3
                 (
-                    halfSize + point.x * size,
-                    halfSize + point.y * size,
-                    halfSize + point.z * size
+                    (halfSize + point.x * size) / transform.localScale.x,
+                    (halfSize + point.y * size) / transform.localScale.y,
+                    (halfSize + point.z * size) / transform.localScale.z
                 );
 
             return localOrigin + transform.TransformPoint(position);
@@ -34,12 +36,15 @@ namespace Essence.Voxel
         public void VoxelizeMesh()
         {
             Bounds bounds = meshRenderer.bounds;
+            bounds.extents = Vector3.Scale(bounds.extents, transform.localScale);
+            b = bounds;
             Vector3 minExtents = bounds.center - bounds.extents;
             Vector3 count = bounds.extents / halfSize;
 
             int xMax = Mathf.CeilToInt(count.x);
             int yMax = Mathf.CeilToInt(count.y);
             int zMax = Mathf.CeilToInt(count.z);
+                        var objectCollider = GetComponent<Collider>();
 
             gridPoints.Clear();
             localOrigin = transform.InverseTransformPoint(minExtents);
@@ -51,9 +56,12 @@ namespace Essence.Voxel
                     for (int y = 0; y < yMax; ++y)
                     {
                         Vector3 pos = PointToWorldPosition(new Vector3Int(x, y, z));
-                        if (Physics.CheckBox(pos, new Vector3(halfSize, halfSize, halfSize)))
+                        foreach(var collider in Physics.OverlapBox(pos, Vector3.one * halfSize * 0.95f))
                         {
+                            if (collider != objectCollider) continue;
+
                             gridPoints.Add(new Vector3Int(x, y, z));
+                            break;
                         }
                     }
                 }
