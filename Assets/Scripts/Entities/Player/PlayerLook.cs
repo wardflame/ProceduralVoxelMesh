@@ -53,8 +53,11 @@ namespace Essence.Entities.Player
             var newRotY = rotY + lookInput.x * Time.deltaTime * rotationPower;
             var newRotX = rotX - lookInput.y * Time.deltaTime * (rotationPower / 2);
 
-            rotY = Mathf.SmoothDamp(rotY, newRotY, ref velocityY, smoothTime);
-            rotX = Mathf.SmoothDamp(rotX, newRotX, ref velocityX, smoothTime);
+            //rotX = Mathf.SmoothDamp(rotX, newRotX, ref velocityX, smoothTime);
+            //rotY = Mathf.SmoothDamp(rotY, newRotY, ref velocityY, smoothTime);
+
+            rotX = newRotX;
+            rotY = newRotY;
 
             rotX = Mathf.Clamp(rotX, -90f, 90f);
 

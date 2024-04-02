@@ -15,6 +15,9 @@ namespace Essence.Voxel
 
         private void FabricateTerrain()
         {
+            GameObject voxelHouser = new GameObject();
+            voxelHouser.name = "VoxelHouser";
+
             foreach (var meshPoint in voxelMesh.gridPoints)
             {
                 var worldPoint = voxelMesh.PointToWorldPosition(meshPoint);
@@ -24,9 +27,12 @@ namespace Essence.Voxel
 
                 var voxelSize = voxelMesh.halfSize * 2;
                 newVoxel.transform.localScale = new Vector3(voxelSize, voxelSize, voxelSize);
+
+                newVoxel.transform.parent = voxelHouser.transform;
             }
 
-            voxelMesh.gameObject.SetActive(false);
+            gameObject.SetActive(false);
+            //Destroy(gameObject);
         }
     }
 }

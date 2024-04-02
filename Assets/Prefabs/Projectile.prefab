@@ -46,6 +46,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   damage: 2
+  impactRadius: 0.25
+  impaceForce: 10
   velocity: 300
   lifetime: 1
 --- !u!1 &6215910417208996513
