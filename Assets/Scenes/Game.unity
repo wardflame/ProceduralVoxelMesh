@@ -1309,7 +1309,7 @@ GameObject:
   - component: {fileID: 1115648858}
   - component: {fileID: 1115648861}
   - component: {fileID: 1115648860}
-  - component: {fileID: 1115648859}
+  - component: {fileID: 1115648862}
   m_Layer: 0
   m_Name: ProceduralMesh
   m_TagString: Untagged
@@ -1332,19 +1332,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1115648859
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1115648857}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6e259a82a685009449cd1e89ef603fbe, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  procMesh: {fileID: 0}
 --- !u!23 &1115648860
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -1395,6 +1382,21 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1115648857}
   m_Mesh: {fileID: 0}
+--- !u!114 &1115648862
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1115648857}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b0bdef0b1fa6ef4084c2d902afc907b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cellSize: 1
+  gridOffset: {x: 0, y: 0, z: 0}
+  gridSize: 2
 --- !u!4 &1206438779 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4120543513828142589, guid: c56df8723cf6b4c459c8848652b713d9,
@@ -1751,7 +1753,7 @@ PrefabInstance:
     - target: {fileID: 456303809947951105, guid: 9a0bc7db46e8066448215b902216ecba,
         type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5726509259156373961, guid: 9a0bc7db46e8066448215b902216ecba,
         type: 3}
