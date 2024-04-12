@@ -49,11 +49,11 @@ namespace Essence.Voxel
                 {
                     for (int z = 0; z < dimensions.z; z++)
                     {
-                        VoxelData newVoxel = new VoxelData(x, y, z, voxelSize, dimensions, this);
+                        VoxelData newVoxel = new VoxelData(x, y, z, this);
                         voxels[x + dimensions.y * y + dimensions.z * z] = newVoxel;
 
-                        vertices.AddRange(newVoxel.vertices);
-                        triangles.AddRange(newVoxel.triangles);
+                        //vertices.AddRange(newVoxel.vertices);
+                        //triangles.AddRange(newVoxel.triangles);
                     }
                 }
             }
