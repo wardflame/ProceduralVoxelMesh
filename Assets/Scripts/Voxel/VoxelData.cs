@@ -14,25 +14,12 @@ namespace Essence.Voxel
         public List<Vector3> vertices = new List<Vector3>();
         public List<int> triangles = new List<int>();
 
+        public bool rendering;
+
         private VoxelMeshManager manager;
 
         private float voxelSize;
         private float voxelHalfSize;
-
-        private static Vector3[][] faceVertices =
-        {
-            // Front face   (+Z)
-
-            // Back face    (-Z)
-
-            // Left face    (-X)
-
-            // Right face   (+X)
-
-            // Top face     (+Y)
-
-            // Bottom face  (-Y)
-        };
 
         public VoxelData(int posX, int posY, int posZ, VoxelMeshManager manager)
         {
@@ -40,24 +27,23 @@ namespace Essence.Voxel
             voxelSize = manager.voxelSize;
             voxelHalfSize = manager.voxelHalfSize;
             coordinates = new Vector3Int(posX, posY, posZ);
-            InitialiseVoxel(voxelSize, manager.dimensions);
+            InitialiseVoxel();
         }
 
-        private void InitialiseVoxel(float voxelSize, Vector3Int meshDimensions)
+        private void InitialiseVoxel()
         {
-            var manPos = manager.transform.position;
+            var meshDimensions = manager.dimensions;
 
             var voxelPos = new Vector3
                 (
-                    manPos.x + (voxelSize * coordinates.x),
-                    manPos.y + (voxelSize * coordinates.y),
-                    manPos.z + (voxelSize * coordinates.z)
+                    voxelSize * coordinates.x + manager.offset.x,
+                    voxelSize * coordinates.y + manager.offset.y,
+                    voxelSize * coordinates.z + manager.offset.z
                 );
-
-            Debug.Log(voxelPos);
 
             Vector3[] newVerts;
 
+            #region Create Vertices
             // Front face   (+Z)
             if (coordinates.z + 1 >= meshDimensions.z)
             {
@@ -141,6 +127,9 @@ namespace Essence.Voxel
 
                 AddRenderData(newVerts, 5, VoxelFacing.Ym);
             }
+            #endregion Create Vertices
+            
+            rendering = true;
         }
 
         private void AddRenderData(Vector3[] newVerts, int facesIndex, VoxelFacing facing)
