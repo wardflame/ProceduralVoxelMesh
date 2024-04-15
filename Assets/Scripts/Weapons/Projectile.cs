@@ -1,5 +1,6 @@
 using Essence.Entities;
 using Essence.Entities.Player;
+using Essence.Voxel;
 using System.Collections;
 using System.Collections.Generic;
 using System.Net;
@@ -95,21 +96,11 @@ namespace Essence.Weapons
             transform.position = hit.point;
 
             // Environment check
-            if (hit.collider.gameObject.layer == LayerManager.INT_VOXEL)
+            if (hit.collider.CompareTag("Voxel"))
             {
-                var voxels = Physics.OverlapSphere(transform.position, impactRadius, LayerMask.GetMask("Voxel"));
+                var vMan = hit.collider.GetComponent<VoxelMeshManager>();
 
-                if (voxels.Length > 0)
-                {
-                    foreach (var voxel in voxels)
-                    {
-                        voxel.attachedRigidbody.isKinematic = false;
-                        var force = Vector3.Reflect((currentPosition - hit.point).normalized, hit.normal) * impaceForce;
-                        Debug.DrawRay(hit.point, force, Color.magenta, 2);
-                        voxel.attachedRigidbody.AddForce(force, ForceMode.Impulse);
-                        Destroy(voxel.gameObject, 1);
-                    }
-                }
+                vMan.LocateVoxel(hit.point - hit.normal * .1f);
             }
 
             // Entity check

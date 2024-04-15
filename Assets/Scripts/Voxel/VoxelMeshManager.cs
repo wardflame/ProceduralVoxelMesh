@@ -27,11 +27,16 @@ namespace Essence.Voxel
         public List<Vector3> vertices;
         public List<int> triangles;
 
+        [Header("OPTIONS")]
+        public bool optimiseMesh;
+
+        private float worldToGrid => 1 / voxelSize;
+
         private void Awake()
         {
             GenerateData();
             GenerateVoxels();
-            OptimiseVertices();
+            if (optimiseMesh) OptimiseVertices();
             GenerateMesh();
         }
 
@@ -87,13 +92,6 @@ namespace Essence.Voxel
             triangles = newTris;
         }
 
-        private VoxelData GetVoxel(int x, int y, int z)
-        {
-            int index = x + dimensions.x * (y + dimensions.y * z);
-            Debug.Log(index);
-            return voxels[index];
-        }
-
         private void GenerateMesh()
         {
             mesh.Clear();
@@ -104,6 +102,32 @@ namespace Essence.Voxel
             mesh.RecalculateNormals();
 
             GetComponent<MeshCollider>().sharedMesh = mesh;
+        }
+
+        private VoxelData GetVoxel(int x, int y, int z)
+        {
+            int index = x + dimensions.x * (y + dimensions.y * z);
+            Debug.Log(index);
+            return voxels[index];
+        }
+
+        public void LocateVoxel(Vector3 worldPosition)
+        {
+            var startPos = transform.position + offset;
+
+            var distanceX = Mathf.Abs(worldPosition.x - startPos.x + 0.01f);
+            var distanceY = Mathf.Abs(worldPosition.y - startPos.y + 0.01f);
+            var distanceZ = Mathf.Abs(worldPosition.z - startPos.z + 0.01f);
+
+            Debug.Log($"ABS: {distanceX}, {distanceY}, {distanceZ}");
+
+            Debug.Log
+                (
+                    $"ROUNDED: " +
+                    $"{Mathf.Round(distanceX * worldToGrid)}, " +
+                    $"{Mathf.Round(distanceY * worldToGrid)}, " +
+                    $"{Mathf.Round(distanceZ * worldToGrid)}"
+                );
         }
     }
 }
