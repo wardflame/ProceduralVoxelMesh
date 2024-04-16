@@ -32,6 +32,10 @@ namespace Essence.Voxel
 
         private float worldToGrid => 1 / voxelSize;
 
+        public System.Action initComplete;
+
+        private MeshCollider meshCollider;
+
         private void Awake()
         {
             GenerateData();
@@ -44,6 +48,8 @@ namespace Essence.Voxel
         {
             mesh = GetComponent<MeshFilter>().mesh;
             mesh.name = "Procedural Voxel Mesh";
+
+            meshCollider = GetComponent<MeshCollider>();
 
             voxels = new VoxelData[dimensions.x * dimensions.y * dimensions.z];
             vertices = new List<Vector3>();
@@ -66,6 +72,8 @@ namespace Essence.Voxel
                     }
                 }
             }
+
+            initComplete?.Invoke();
         }
 
         private void OptimiseVertices()
@@ -77,10 +85,10 @@ namespace Essence.Voxel
 
             List<Vector3> newVerts = new List<Vector3>
             {
-                GetVoxel(0,0,0).GetVoxelFaceByFacing(VoxelFacing.Zm).vertices[0],
-                GetVoxel(0,2,0).GetVoxelFaceByFacing(VoxelFacing.Zm).vertices[1],
-                GetVoxel(4,0,0).GetVoxelFaceByFacing(VoxelFacing.Zm).vertices[2],
-                GetVoxel(4,2,0).GetVoxelFaceByFacing(VoxelFacing.Zm).vertices[3]
+                GetVoxel(0,0,0).GetFacebyFacing(VoxelFacing.Zm).vertices[0],
+                GetVoxel(0,dimensions.y - 1,0).GetFacebyFacing(VoxelFacing.Zm).vertices[1],
+                GetVoxel(dimensions.x - 1,0,0).GetFacebyFacing(VoxelFacing.Zm).vertices[2],
+                GetVoxel(dimensions.x - 1,dimensions.y - 1,0).GetFacebyFacing(VoxelFacing.Zm).vertices[3]
             };
 
             List<int> newTris = new List<int>
@@ -92,6 +100,11 @@ namespace Essence.Voxel
             triangles = newTris;
         }
 
+        private void FindVerticesForMesh()
+        {
+
+        }
+
         private void GenerateMesh()
         {
             mesh.Clear();
@@ -101,33 +114,64 @@ namespace Essence.Voxel
 
             mesh.RecalculateNormals();
 
-            GetComponent<MeshCollider>().sharedMesh = mesh;
+            if (vertices.Count > 0) meshCollider.sharedMesh = mesh;
+            else meshCollider.enabled = false;
         }
 
-        private VoxelData GetVoxel(int x, int y, int z)
+        public VoxelData GetVoxel(int x, int y, int z)
         {
             int index = x + dimensions.x * (y + dimensions.y * z);
-            Debug.Log(index);
+
+            if (index >= voxels.Length || index < 0) return null;
+
             return voxels[index];
         }
 
-        public void LocateVoxel(Vector3 worldPosition)
+        public VoxelData GetVoxel(Vector3Int coords)
+        {
+            return GetVoxel(coords.x, coords.y, coords.z);
+        }
+
+        public VoxelData LocateVoxel(Vector3 worldPosition)
         {
             var startPos = transform.position + offset;
 
-            var distanceX = Mathf.Abs(worldPosition.x - startPos.x + 0.01f);
-            var distanceY = Mathf.Abs(worldPosition.y - startPos.y + 0.01f);
-            var distanceZ = Mathf.Abs(worldPosition.z - startPos.z + 0.01f);
+            var distanceX = Mathf.Abs(worldPosition.x - startPos.x);
+            var distanceY = Mathf.Abs(worldPosition.y - startPos.y);
+            var distanceZ = Mathf.Abs(worldPosition.z - startPos.z);
 
             Debug.Log($"ABS: {distanceX}, {distanceY}, {distanceZ}");
 
-            Debug.Log
-                (
-                    $"ROUNDED: " +
-                    $"{Mathf.Round(distanceX * worldToGrid)}, " +
-                    $"{Mathf.Round(distanceY * worldToGrid)}, " +
-                    $"{Mathf.Round(distanceZ * worldToGrid)}"
-                );
+            int x = Mathf.RoundToInt(distanceX * worldToGrid);
+            int y = Mathf.RoundToInt(distanceY * worldToGrid);
+            int z = Mathf.RoundToInt(distanceZ * worldToGrid);
+
+            Debug.Log($"ROUNDED: {x}, {y}, {z}");
+
+            return GetVoxel(x, y, z);
+        }
+
+        public void DisableVoxel(Vector3 worldPosition)
+        {
+            VoxelData target = LocateVoxel(worldPosition);
+
+            target.rendering = false;
+
+            //target.DisableFaces();
+
+            RefreshRenderData();
+            GenerateMesh();
+        }
+
+        private void RefreshRenderData()
+        {
+            vertices.Clear();
+            triangles.Clear();
+
+            foreach (var voxel in voxels)
+            {
+                voxel.SupplyRenderData();
+            }
         }
     }
 }

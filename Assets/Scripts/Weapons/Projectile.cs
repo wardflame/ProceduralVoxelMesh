@@ -1,9 +1,6 @@
 using Essence.Entities;
-using Essence.Entities.Player;
 using Essence.Voxel;
 using System.Collections;
-using System.Collections.Generic;
-using System.Net;
 using UnityEngine;
 
 namespace Essence.Weapons
@@ -99,8 +96,7 @@ namespace Essence.Weapons
             if (hit.collider.CompareTag("Voxel"))
             {
                 var vMan = hit.collider.GetComponent<VoxelMeshManager>();
-
-                vMan.LocateVoxel(hit.point - hit.normal * .1f);
+                vMan.DisableVoxel(hit.point - hit.normal * .05f);
             }
 
             // Entity check

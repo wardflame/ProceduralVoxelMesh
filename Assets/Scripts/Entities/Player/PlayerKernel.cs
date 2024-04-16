@@ -1,8 +1,6 @@
 using Cinemachine;
-using UnityEngine;
 using Essence.Weapons;
-using System.Linq;
-using UnityEditor;
+using UnityEngine;
 
 namespace Essence.Entities.Player
 {

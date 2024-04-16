@@ -46,8 +46,6 @@ public class ProjectBuildHandler : IPreprocessBuildWithReport
         }
         string versionWOBuild = versionStr.Remove(versionStr.LastIndexOf('.'));
 
-        Debug.Log(versionWOBuild);
-
         buildNum++;
 
         string newVersion = versionWOBuild + "." + buildNum.ToString();

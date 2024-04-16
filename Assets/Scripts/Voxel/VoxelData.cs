@@ -1,13 +1,15 @@
+using System;
 using System.Collections.Generic;
-using System.Threading.Tasks.Sources;
+using System.Linq;
 using UnityEngine;
+using UnityEngine.UIElements.Experimental;
 
 namespace Essence.Voxel
 {
     public class VoxelData
     {
-        public Vector3Int coordinates;
-        public List<VoxelData> neighbours;
+        public Vector3Int gridLoc;
+        public VoxelData[] neighbours = new VoxelData[6];
 
         public VoxelFaceData[] faces = new VoxelFaceData[6];
 
@@ -21,144 +23,214 @@ namespace Essence.Voxel
         private float voxelSize;
         private float voxelHalfSize;
 
+        private List<VoxelData> neighbourVoxels = new List<VoxelData>();
+
         public VoxelData(int posX, int posY, int posZ, VoxelMeshManager manager)
         {
             this.manager = manager;
             voxelSize = manager.voxelSize;
             voxelHalfSize = manager.voxelHalfSize;
-            coordinates = new Vector3Int(posX, posY, posZ);
-            InitialiseVoxel();
+            gridLoc = new Vector3Int(posX, posY, posZ);
+            rendering = true;
+            manager.initComplete += InitialiseVoxel;
         }
 
         private void InitialiseVoxel()
         {
-            var meshDimensions = manager.dimensions;
-
+            InitFaces();
+            InitNeighbours();
+            SupplyRenderData();
+        }
+        
+        private void InitFaces()
+        {
             var voxelPos = new Vector3
                 (
-                    voxelSize * coordinates.x + manager.offset.x,
-                    voxelSize * coordinates.y + manager.offset.y,
-                    voxelSize * coordinates.z + manager.offset.z
+                    voxelSize * gridLoc.x + manager.offset.x,
+                    voxelSize * gridLoc.y + manager.offset.y,
+                    voxelSize * gridLoc.z + manager.offset.z
                 );
 
-            Vector3[] newVerts;
+            faces[0] = new VoxelFaceData
+                (
+                    VoxelFacing.Z,
+                    new Vector3[]
+                    {
+                        new Vector3(voxelPos.x + voxelHalfSize, voxelPos.y - voxelHalfSize, voxelPos.z + voxelHalfSize), // 0
+                        new Vector3(voxelPos.x + voxelHalfSize, voxelPos.y + voxelHalfSize, voxelPos.z + voxelHalfSize), // 1
+                        new Vector3(voxelPos.x - voxelHalfSize, voxelPos.y - voxelHalfSize, voxelPos.z + voxelHalfSize), // 2
+                        new Vector3(voxelPos.x - voxelHalfSize, voxelPos.y + voxelHalfSize, voxelPos.z + voxelHalfSize)  // 3
+                    }
+                );
 
-            #region Create Vertices
-            // Front face   (+Z)
-            if (coordinates.z + 1 >= meshDimensions.z)
+            faces[1] = new VoxelFaceData
+                (
+                    VoxelFacing.Zm,
+                    new Vector3[]
+                    {
+                        new Vector3(voxelPos.x - voxelHalfSize, voxelPos.y - voxelHalfSize, voxelPos.z - voxelHalfSize), // 0
+                        new Vector3(voxelPos.x - voxelHalfSize, voxelPos.y + voxelHalfSize, voxelPos.z - voxelHalfSize), // 1
+                        new Vector3(voxelPos.x + voxelHalfSize, voxelPos.y - voxelHalfSize, voxelPos.z - voxelHalfSize), // 2
+                        new Vector3(voxelPos.x + voxelHalfSize, voxelPos.y + voxelHalfSize, voxelPos.z - voxelHalfSize)  // 3
+                    }
+                );
+
+            faces[2] = new VoxelFaceData
+                (
+                    VoxelFacing.X,
+                    new Vector3[]
+                    {
+                        new Vector3(voxelPos.x + voxelHalfSize, voxelPos.y - voxelHalfSize, voxelPos.z - voxelHalfSize), // 0
+                        new Vector3(voxelPos.x + voxelHalfSize, voxelPos.y + voxelHalfSize, voxelPos.z - voxelHalfSize), // 1
+                        new Vector3(voxelPos.x + voxelHalfSize, voxelPos.y - voxelHalfSize, voxelPos.z + voxelHalfSize), // 2
+                        new Vector3(voxelPos.x + voxelHalfSize, voxelPos.y + voxelHalfSize, voxelPos.z + voxelHalfSize)  // 3
+                    }
+                );
+
+            faces[3] = new VoxelFaceData
+                (
+                    VoxelFacing.Xm,
+                    new Vector3[]
+                    {
+                        new Vector3(voxelPos.x - voxelHalfSize, voxelPos.y - voxelHalfSize, voxelPos.z + voxelHalfSize), // 0
+                        new Vector3(voxelPos.x - voxelHalfSize, voxelPos.y + voxelHalfSize, voxelPos.z + voxelHalfSize), // 1
+                        new Vector3(voxelPos.x - voxelHalfSize, voxelPos.y - voxelHalfSize, voxelPos.z - voxelHalfSize), // 2
+                        new Vector3(voxelPos.x - voxelHalfSize, voxelPos.y + voxelHalfSize, voxelPos.z - voxelHalfSize)  // 3
+                    }
+                );
+
+            faces[4] = new VoxelFaceData
+                (
+                    VoxelFacing.Y,
+                    new Vector3[]
+                    {
+                        new Vector3(voxelPos.x - voxelHalfSize, voxelPos.y + voxelHalfSize, voxelPos.z - voxelHalfSize), // 0
+                        new Vector3(voxelPos.x - voxelHalfSize, voxelPos.y + voxelHalfSize, voxelPos.z + voxelHalfSize), // 1
+                        new Vector3(voxelPos.x + voxelHalfSize, voxelPos.y + voxelHalfSize, voxelPos.z - voxelHalfSize), // 2
+                        new Vector3(voxelPos.x + voxelHalfSize, voxelPos.y + voxelHalfSize, voxelPos.z + voxelHalfSize)  // 3
+                    }
+                );
+
+            faces[5] = new VoxelFaceData
+                (
+                    VoxelFacing.Ym,
+                    new Vector3[]
+                    {
+                        new Vector3(voxelPos.x - voxelHalfSize, voxelPos.y - voxelHalfSize, voxelPos.z + voxelHalfSize), // 0
+                        new Vector3(voxelPos.x - voxelHalfSize, voxelPos.y - voxelHalfSize, voxelPos.z - voxelHalfSize), // 1
+                        new Vector3(voxelPos.x + voxelHalfSize, voxelPos.y - voxelHalfSize, voxelPos.z + voxelHalfSize), // 2
+                        new Vector3(voxelPos.x + voxelHalfSize, voxelPos.y - voxelHalfSize, voxelPos.z - voxelHalfSize)  // 3
+                    }
+                );
+        }
+        
+        private void InitNeighbours()
+        {
+            neighbours[0] = manager.GetVoxel(gridLoc.x, gridLoc.y, gridLoc.z + 1);
+            neighbours[1] = manager.GetVoxel(gridLoc.x, gridLoc.y, gridLoc.z - 1);
+            neighbours[2] = manager.GetVoxel(gridLoc.x + 1, gridLoc.y, gridLoc.z);
+            neighbours[3] = manager.GetVoxel(gridLoc.x - 1, gridLoc.y, gridLoc.z);
+            neighbours[4] = manager.GetVoxel(gridLoc.x, gridLoc.y + 1, gridLoc.z);
+            neighbours[5] = manager.GetVoxel(gridLoc.x, gridLoc.y - 1, gridLoc.z);
+        }
+
+        public void SupplyRenderData()
+        {
+            if (!rendering) return;
+
+            foreach (var face in faces)
             {
-                newVerts = new Vector3[]
+                int[] newTris = new int[]
                 {
-                    new Vector3(voxelPos.x + voxelHalfSize, voxelPos.y - voxelHalfSize, voxelPos.z + voxelHalfSize), // 0
-                    new Vector3(voxelPos.x + voxelHalfSize, voxelPos.y + voxelHalfSize, voxelPos.z + voxelHalfSize), // 1
-                    new Vector3(voxelPos.x - voxelHalfSize, voxelPos.y - voxelHalfSize, voxelPos.z + voxelHalfSize), // 2
-                    new Vector3(voxelPos.x - voxelHalfSize, voxelPos.y + voxelHalfSize, voxelPos.z + voxelHalfSize)  // 3
+                    manager.vertices.Count,
+                    manager.vertices.Count + 1,
+                    manager.vertices.Count + 2,
+                    manager.vertices.Count + 2,
+                    manager.vertices.Count + 1,
+                    manager.vertices.Count + 3
                 };
 
-                AddRenderData(newVerts, 0, VoxelFacing.Z);
-            }
+                int[] triIndexes = new int[6];
 
-            // Back face    (-Z)
-            if (coordinates.z - 1 < 0)
-            {
-                newVerts = new Vector3[]
+                for (int i = 0; i <  newTris.Length; i++)
                 {
-                    new Vector3(voxelPos.x - voxelHalfSize, voxelPos.y - voxelHalfSize, voxelPos.z - voxelHalfSize), // 0
-                    new Vector3(voxelPos.x - voxelHalfSize, voxelPos.y + voxelHalfSize, voxelPos.z - voxelHalfSize), // 1
-                    new Vector3(voxelPos.x + voxelHalfSize, voxelPos.y - voxelHalfSize, voxelPos.z - voxelHalfSize), // 2
-                    new Vector3(voxelPos.x + voxelHalfSize, voxelPos.y + voxelHalfSize, voxelPos.z - voxelHalfSize)  // 3
-                };
+                    manager.triangles.Add(newTris[i]);
+                    triIndexes[i] = manager.triangles.Count - 1;
+                }
 
-                AddRenderData(newVerts, 1, VoxelFacing.Zm);
+                face.UpdateTriangles(triIndexes);
+
+                manager.vertices.AddRange(face.vertices);
             }
+        }
 
-            // Left face    (-X)
-            if (coordinates.x - 1 < 0)
-            {
-                newVerts = new Vector3[]
-                {
-                    new Vector3(voxelPos.x - voxelHalfSize, voxelPos.y - voxelHalfSize, voxelPos.z + voxelHalfSize), // 0
-                    new Vector3(voxelPos.x - voxelHalfSize, voxelPos.y + voxelHalfSize, voxelPos.z + voxelHalfSize), // 1
-                    new Vector3(voxelPos.x - voxelHalfSize, voxelPos.y - voxelHalfSize, voxelPos.z - voxelHalfSize), // 2
-                    new Vector3(voxelPos.x - voxelHalfSize, voxelPos.y + voxelHalfSize, voxelPos.z - voxelHalfSize)  // 3
-                };
-
-                AddRenderData(newVerts, 2, VoxelFacing.Xm);
-            }
-
-            // Right face   (+X)
-            if (coordinates.x + 1 >= meshDimensions.x)
-            {
-                newVerts = new Vector3[]
-                {
-                    new Vector3(voxelPos.x + voxelHalfSize, voxelPos.y - voxelHalfSize, voxelPos.z - voxelHalfSize), // 0
-                    new Vector3(voxelPos.x + voxelHalfSize, voxelPos.y + voxelHalfSize, voxelPos.z - voxelHalfSize), // 1
-                    new Vector3(voxelPos.x + voxelHalfSize, voxelPos.y - voxelHalfSize, voxelPos.z + voxelHalfSize), // 2
-                    new Vector3(voxelPos.x + voxelHalfSize, voxelPos.y + voxelHalfSize, voxelPos.z + voxelHalfSize)  // 3
-                };
-
-                AddRenderData(newVerts, 3, VoxelFacing.X);
-            }
-
-            // Top face     (+Y)
-            if (coordinates.y + 1 >= meshDimensions.y)
-            {
-                newVerts = new Vector3[]
-                {
-                    new Vector3(voxelPos.x - voxelHalfSize, voxelPos.y + voxelHalfSize, voxelPos.z - voxelHalfSize), // 0
-                    new Vector3(voxelPos.x - voxelHalfSize, voxelPos.y + voxelHalfSize, voxelPos.z + voxelHalfSize), // 1
-                    new Vector3(voxelPos.x + voxelHalfSize, voxelPos.y + voxelHalfSize, voxelPos.z - voxelHalfSize), // 2
-                    new Vector3(voxelPos.x + voxelHalfSize, voxelPos.y + voxelHalfSize, voxelPos.z + voxelHalfSize)  // 3
-                };
-
-                AddRenderData(newVerts, 4, VoxelFacing.Y);
-            }
-
-            // Bottom face  (-Y)
-            if (coordinates.y - 1 < 0)
-            {
-                newVerts = new Vector3[]
-                {
-                    new Vector3(voxelPos.x - voxelHalfSize, voxelPos.y - voxelHalfSize, voxelPos.z + voxelHalfSize), // 0
-                    new Vector3(voxelPos.x - voxelHalfSize, voxelPos.y - voxelHalfSize, voxelPos.z - voxelHalfSize), // 1
-                    new Vector3(voxelPos.x + voxelHalfSize, voxelPos.y - voxelHalfSize, voxelPos.z + voxelHalfSize), // 2
-                    new Vector3(voxelPos.x + voxelHalfSize, voxelPos.y - voxelHalfSize, voxelPos.z - voxelHalfSize)  // 3
-                };
-
-                AddRenderData(newVerts, 5, VoxelFacing.Ym);
-            }
-            #endregion Create Vertices
+        private void UpdateRenderData()
+        {
             
-            rendering = true;
-        }
+            
+            
+            
+            
+            
+            /*bool outOfBounds;
 
-        private void AddRenderData(Vector3[] newVerts, int facesIndex, VoxelFacing facing)
-        {
-            var newTris = new int[]
+            switch (targetFacing)
             {
-                manager.vertices.Count,
-                manager.vertices.Count + 1,
-                manager.vertices.Count + 2,
-                manager.vertices.Count + 2,
-                manager.vertices.Count + 1,
-                manager.vertices.Count + 3
-            };
+                case VoxelFacing.Z:
 
-            manager.triangles.AddRange(newTris);
-            manager.vertices.AddRange(newVerts);
 
-            faces[facesIndex] = new VoxelFaceData(facing, newVerts, newTris, true);
-        }
-
-        public VoxelFaceData GetVoxelFaceByFacing(VoxelFacing facing)
-        {
-            for (int i = 0; i < faces.Length; i++)
-            {
-                if (faces[i] == null) continue;
-                if (faces[i].facing == facing) return faces[i];
+                    break;
             }
 
-            return null;
+            if (gridLoc.z + 1 >= meshDimensions.z)
+            {
+                SupplyRenderData(newVerts);
+            }
+            else
+            {
+                VoxelData zVoxel = manager.GetVoxel(gridLoc.x, gridLoc.y, gridLoc.z + 1);
+
+                if (zVoxel != null)
+                {
+                    neighbourVoxels.Add(zVoxel);
+
+                    if (zVoxel.rendering == false) SupplyRenderData(newVerts);
+                }
+            }
+
+            if (gridLoc.x - 1 < 0)
+            {
+                SupplyRenderData(newVerts);
+            }
+            else
+            {
+                VoxelData zVoxel = manager.GetVoxel(gridLoc.x - 1, gridLoc.y, gridLoc.z);
+
+                if (zVoxel != null)
+                {
+                    neighbourVoxels.Add(zVoxel);
+
+                    if (zVoxel.rendering == false) SupplyRenderData(newVerts);
+                }
+            }*/
+        }
+
+        private void UpdateFaceVertices(VoxelFacing facing)
+        {
+            VoxelFaceData face = GetFacebyFacing(facing);
+            VoxelData neighbour = GetNeighbourByFacing(facing);
+
+
+        }
+
+        public VoxelFaceData GetFacebyFacing(VoxelFacing facing)
+        {
+            return faces[(int)facing];
+        }
+
+        private VoxelData GetNeighbourByFacing(VoxelFacing facing)
+        {
+            return neighbours[(int)facing];
         }
     }
 
