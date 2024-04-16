@@ -161,64 +161,7 @@ namespace Essence.Voxel
             }
         }
 
-        private void UpdateRenderData()
-        {
-
-
-
-
-
-
-            /*bool outOfBounds;
-
-            switch (targetFacing)
-            {
-                case VoxelFacing.Z:
-
-
-                    break;
-            }
-
-            if (gridLoc.z + 1 >= meshDimensions.z)
-            {
-                SupplyRenderData(newVerts);
-            }
-            else
-            {
-                VoxelData zVoxel = manager.GetVoxel(gridLoc.x, gridLoc.y, gridLoc.z + 1);
-
-                if (zVoxel != null)
-                {
-                    neighbourVoxels.Add(zVoxel);
-
-                    if (zVoxel.rendering == false) SupplyRenderData(newVerts);
-                }
-            }
-
-            if (gridLoc.x - 1 < 0)
-            {
-                SupplyRenderData(newVerts);
-            }
-            else
-            {
-                VoxelData zVoxel = manager.GetVoxel(gridLoc.x - 1, gridLoc.y, gridLoc.z);
-
-                if (zVoxel != null)
-                {
-                    neighbourVoxels.Add(zVoxel);
-
-                    if (zVoxel.rendering == false) SupplyRenderData(newVerts);
-                }
-            }*/
-        }
-
-        private void UpdateFaceVertices(VoxelFacing facing)
-        {
-            VoxelFaceData face = GetFacebyFacing(facing);
-            VoxelData neighbour = GetNeighbourByFacing(facing);
-
-
-        }
+        // METHOD TO DETERMINE WHETHER VERTICES ARE NEEDED
 
         public VoxelFaceData GetFacebyFacing(VoxelFacing facing)
         {

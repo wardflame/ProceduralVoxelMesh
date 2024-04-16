@@ -102,7 +102,7 @@ namespace Essence.Voxel
 
         private void FindVerticesForMesh()
         {
-
+            // METHOD TO FIND OPTIMISED VERTICES?
         }
 
         private void GenerateMesh()
