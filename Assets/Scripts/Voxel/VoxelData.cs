@@ -1,8 +1,5 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
-using UnityEngine.UIElements.Experimental;
 
 namespace Essence.Voxel
 {
@@ -41,7 +38,7 @@ namespace Essence.Voxel
             InitNeighbours();
             SupplyRenderData();
         }
-        
+
         private void InitFaces()
         {
             var voxelPos = new Vector3
@@ -123,7 +120,7 @@ namespace Essence.Voxel
                     }
                 );
         }
-        
+
         private void InitNeighbours()
         {
             neighbours[0] = manager.GetVoxel(gridLoc.x, gridLoc.y, gridLoc.z + 1);
@@ -152,7 +149,7 @@ namespace Essence.Voxel
 
                 int[] triIndexes = new int[6];
 
-                for (int i = 0; i <  newTris.Length; i++)
+                for (int i = 0; i < newTris.Length; i++)
                 {
                     manager.triangles.Add(newTris[i]);
                     triIndexes[i] = manager.triangles.Count - 1;
@@ -166,12 +163,12 @@ namespace Essence.Voxel
 
         private void UpdateRenderData()
         {
-            
-            
-            
-            
-            
-            
+
+
+
+
+
+
             /*bool outOfBounds;
 
             switch (targetFacing)
