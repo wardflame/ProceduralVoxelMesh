@@ -1,34 +1,32 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace Essence.Voxel
 {
-    public class VoxelData
+    public class Voxel
     {
         public Vector3Int gridLoc;
-        public VoxelData[] neighbours = new VoxelData[6];
+        public Voxel[] neighbours = new Voxel[6];
 
-        public VoxelFaceData[] faces = new VoxelFaceData[6];
+        public VoxelFace[] faces = new VoxelFace[6];
 
         public List<Vector3> vertices = new List<Vector3>();
         public List<int> triangles = new List<int>();
 
-        public bool rendering;
+        public bool rendering = true;
 
         private VoxelMeshManager manager;
 
         private float voxelSize;
         private float voxelHalfSize;
 
-        private List<VoxelData> neighbourVoxels = new List<VoxelData>();
-
-        public VoxelData(int posX, int posY, int posZ, VoxelMeshManager manager)
+        public Voxel(int posX, int posY, int posZ, VoxelMeshManager manager)
         {
             this.manager = manager;
             voxelSize = manager.voxelSize;
             voxelHalfSize = manager.voxelHalfSize;
             gridLoc = new Vector3Int(posX, posY, posZ);
-            rendering = true;
             manager.initComplete += InitialiseVoxel;
         }
 
@@ -36,7 +34,7 @@ namespace Essence.Voxel
         {
             InitFaces();
             InitNeighbours();
-            SupplyRenderData();
+            SupplyVisibleFaces();
         }
 
         private void InitFaces()
@@ -48,7 +46,7 @@ namespace Essence.Voxel
                     voxelSize * gridLoc.z + manager.offset.z
                 );
 
-            faces[0] = new VoxelFaceData
+            faces[0] = new VoxelFace
                 (
                     VoxelFacing.Z,
                     new Vector3[]
@@ -60,7 +58,7 @@ namespace Essence.Voxel
                     }
                 );
 
-            faces[1] = new VoxelFaceData
+            faces[1] = new VoxelFace
                 (
                     VoxelFacing.Zm,
                     new Vector3[]
@@ -72,7 +70,7 @@ namespace Essence.Voxel
                     }
                 );
 
-            faces[2] = new VoxelFaceData
+            faces[2] = new VoxelFace
                 (
                     VoxelFacing.X,
                     new Vector3[]
@@ -84,7 +82,7 @@ namespace Essence.Voxel
                     }
                 );
 
-            faces[3] = new VoxelFaceData
+            faces[3] = new VoxelFace
                 (
                     VoxelFacing.Xm,
                     new Vector3[]
@@ -96,7 +94,7 @@ namespace Essence.Voxel
                     }
                 );
 
-            faces[4] = new VoxelFaceData
+            faces[4] = new VoxelFace
                 (
                     VoxelFacing.Y,
                     new Vector3[]
@@ -108,7 +106,7 @@ namespace Essence.Voxel
                     }
                 );
 
-            faces[5] = new VoxelFaceData
+            faces[5] = new VoxelFace
                 (
                     VoxelFacing.Ym,
                     new Vector3[]
@@ -129,11 +127,27 @@ namespace Essence.Voxel
             neighbours[3] = manager.GetVoxel(gridLoc.x - 1, gridLoc.y, gridLoc.z);
             neighbours[4] = manager.GetVoxel(gridLoc.x, gridLoc.y + 1, gridLoc.z);
             neighbours[5] = manager.GetVoxel(gridLoc.x, gridLoc.y - 1, gridLoc.z);
+
+            /*if (gridLoc.x == 0 && gridLoc.y == 1)
+            {
+                Debug.Log(manager.GetVoxel(gridLoc.x - 1, gridLoc.y, gridLoc.z));
+                Debug.Log(neighbours[3]);
+            }*/
         }
 
-        public void SupplyRenderData()
+        public void SupplyVisibleFaces()
         {
             if (!rendering) return;
+
+            List<VoxelFacing> faces = new();
+
+            for (int i = 0; i < neighbours.Length; i++)
+            {
+                if (neighbours[i] == null || !neighbours[i].rendering)
+                {
+                    faces.Add((VoxelFacing)i);
+                }
+            }
 
             foreach (var face in faces)
             {
@@ -144,31 +158,42 @@ namespace Essence.Voxel
                     manager.vertices.Count + 2,
                     manager.vertices.Count + 2,
                     manager.vertices.Count + 1,
-                    manager.vertices.Count + 3
+                    manager.vertices.Count + 3,
                 };
 
-                int[] triIndexes = new int[6];
-
-                for (int i = 0; i < newTris.Length; i++)
-                {
-                    manager.triangles.Add(newTris[i]);
-                    triIndexes[i] = manager.triangles.Count - 1;
-                }
-
-                face.UpdateTriangles(triIndexes);
-
-                manager.vertices.AddRange(face.vertices);
+                manager.vertices.AddRange(GetFacebyFacing(face).vertices);
+                manager.triangles.AddRange(newTris);
             }
         }
 
-        // METHOD TO DETERMINE WHETHER VERTICES ARE NEEDED
+        public void DetermineEfficientVertices()
+        {
+            for (int i = 0; i < neighbours.Length; i++)
+            {
+                if (neighbours[i] == null || !neighbours[i].rendering)
+                {
+                    switch ((VoxelFacing)i)
+                    {
+                        case VoxelFacing.Z:
 
-        public VoxelFaceData GetFacebyFacing(VoxelFacing facing)
+
+                            break;
+
+                        case VoxelFacing.X:
+
+
+                            break;
+                    }
+                }
+            }
+        }
+
+        public VoxelFace GetFacebyFacing(VoxelFacing facing)
         {
             return faces[(int)facing];
         }
 
-        private VoxelData GetNeighbourByFacing(VoxelFacing facing)
+        private Voxel GetNeighbourByFacing(VoxelFacing facing)
         {
             return neighbours[(int)facing];
         }

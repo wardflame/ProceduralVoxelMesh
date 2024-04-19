@@ -4,13 +4,13 @@ using UnityEngine;
 
 namespace Essence.Voxel
 {
-    public class VoxelFaceData
+    public class VoxelFace
     {
         public VoxelFacing facing;
         public Vector3[] vertices;
         public List<int> triangles;
 
-        public VoxelFaceData(VoxelFacing facing, Vector3[] vertices)
+        public VoxelFace(VoxelFacing facing, Vector3[] vertices)
         {
             this.facing = facing;
             this.vertices = vertices;
