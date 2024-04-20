@@ -373,18 +373,18 @@ namespace Essence.Voxel
             GenerateMesh();
         }
     }
-}
 
-public struct VoxelPayload
-{
-    public VoxelPayload(List<Voxel> voxelGroup, Vector3Int groupDimensions)
+    public struct VoxelPayload
     {
-        this.voxelGroup = voxelGroup;
-        this.groupDimensions = groupDimensions;
-        bounds = new(groupDimensions.x + 1, groupDimensions.y + 1, groupDimensions.z + 1);
-    }
+        public VoxelPayload(List<Voxel> voxelGroup, Vector3Int groupDimensions)
+        {
+            this.voxelGroup = voxelGroup;
+            this.groupDimensions = groupDimensions;
+            bounds = new(groupDimensions.x + 1, groupDimensions.y + 1, groupDimensions.z + 1);
+        }
 
-    public List<Voxel> voxelGroup;
-    public Vector3Int groupDimensions;
-    public Vector3Int bounds;
+        public List<Voxel> voxelGroup;
+        public Vector3Int groupDimensions;
+        public Vector3Int bounds;
+    }
 }
