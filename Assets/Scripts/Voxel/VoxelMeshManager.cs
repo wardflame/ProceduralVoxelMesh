@@ -1,5 +1,7 @@
+using Essence.Voxel;
 using System.Collections.Generic;
 using System.Linq;
+using TMPro;
 using UnityEngine;
 
 namespace Essence.Voxel
@@ -42,7 +44,10 @@ namespace Essence.Voxel
         {
             GenerateData();
             GenerateVoxels();
-            if (optimiseMesh) OptimiseVertices();
+
+            if (optimiseMesh) CreateOptimisedMeshData();
+            else SupplyFaces();
+
             GenerateMesh();
         }
 
@@ -80,50 +85,8 @@ namespace Essence.Voxel
             initComplete?.Invoke();
         }
 
-        private void OptimiseVertices()
+        private Voxel FindValidVoxel(List<Voxel> invalidVoxels)
         {
-            vertices.Clear();
-            triangles.Clear();
-
-            Debug.Log(voxels.Count());
-
-            List<Vector3> newVerts = new List<Vector3>
-            {
-                GetVoxel(0,0,0).GetFacebyFacing(VoxelFacing.Zm).vertices[0],
-                GetVoxel(0,dimensions.y - 1,0).GetFacebyFacing(VoxelFacing.Zm).vertices[1],
-                GetVoxel(dimensions.x - 1,0,0).GetFacebyFacing(VoxelFacing.Zm).vertices[2],
-                GetVoxel(dimensions.x - 1,dimensions.y - 1,0).GetFacebyFacing(VoxelFacing.Zm).vertices[3],
-
-                GetVoxel(dimensions.x - 1,0,0).GetFacebyFacing(VoxelFacing.X).vertices[0],
-                GetVoxel(dimensions.x - 1,dimensions.y - 1,0).GetFacebyFacing(VoxelFacing.X).vertices[1],
-                GetVoxel(dimensions.x - 1,0,dimensions.z - 1).GetFacebyFacing(VoxelFacing.X).vertices[2],
-                GetVoxel(dimensions.x - 1,dimensions.y - 1,dimensions.z - 1).GetFacebyFacing(VoxelFacing.X).vertices[3],
-
-                /*GetVoxel(0,0,0).GetFacebyFacing(VoxelFacing.Zm).vertices[0],
-                GetVoxel(0,dimensions.y - 1,0).GetFacebyFacing(VoxelFacing.Zm).vertices[1],
-                GetVoxel(dimensions.x - 1,0,0).GetFacebyFacing(VoxelFacing.Zm).vertices[2],
-                GetVoxel(dimensions.x - 1,dimensions.y - 1,0).GetFacebyFacing(VoxelFacing.Zm).vertices[3],
-
-                GetVoxel(0,0,0).GetFacebyFacing(VoxelFacing.Zm).vertices[0],
-                GetVoxel(0,dimensions.y - 1,0).GetFacebyFacing(VoxelFacing.Zm).vertices[1],
-                GetVoxel(dimensions.x - 1,0,0).GetFacebyFacing(VoxelFacing.Zm).vertices[2],
-                GetVoxel(dimensions.x - 1,dimensions.y - 1,0).GetFacebyFacing(VoxelFacing.Zm).vertices[3]*/
-            };
-
-            List<int> newTris = new List<int>
-            {
-                0, 1, 2, 2, 1, 3,
-                4, 5, 6, 6, 5, 7
-            };
-
-            vertices = newVerts;
-            triangles = newTris;
-        }
-
-        private void FindRenderingVoxel()
-        {
-            // METHOD TO FIND OPTIMISED VERTICES?
-
             Voxel startVoxel = null;
 
             for (int z = 0; z < dimensions.z; z++)
@@ -133,8 +96,7 @@ namespace Essence.Voxel
                     for (int x = 0; x < dimensions.x; x++)
                     {
                         startVoxel = GetVoxel(x, y, z);
-                        Debug.Log(startVoxel.gridLoc);
-                        if (startVoxel != null && startVoxel.rendering)
+                        if (startVoxel != null && startVoxel.rendering && !invalidVoxels.Contains(startVoxel))
                         {
                             x = dimensions.x;
                             y = dimensions.y;
@@ -144,17 +106,22 @@ namespace Essence.Voxel
                 }
             }
 
+            return startVoxel;
+        }
+
+        private VoxelPayload FindVoxelsToOptimise(Voxel startVoxel, List<Voxel> invalidVoxels)
+        {
             Debug.Log($"Start Voxel: {startVoxel.gridLoc}");
 
             if (startVoxel == null || !startVoxel.rendering) Debug.Log("Couldn't find Voxel");
 
+            // ITERATE AND FIND VOXELS TO MAKE A NEW SUB-CUBE
             List<Voxel> voxelGroup = new();
             var startLoc = startVoxel.gridLoc;
             Voxel nextVoxel = null;
 
-            int xExtent = startLoc.x;
-            int yExtent = startLoc.y;
-            int zExtent = startLoc.z;
+            Vector3Int extent = startLoc;
+            Vector3Int groupDimensions = new();
 
             for (int z = startLoc.z; z < dimensions.z; ++z)
             {
@@ -163,40 +130,186 @@ namespace Essence.Voxel
                     for (int x = startLoc.x; x < dimensions.x; ++x)
                     {
                         nextVoxel = GetVoxel(x, y, z);
-                        Debug.Log($"nV: {nextVoxel}");
-                        if (nextVoxel != null && nextVoxel.rendering)
+                        if (nextVoxel != null && nextVoxel.rendering && !invalidVoxels.Contains(nextVoxel))
                         {
                             voxelGroup.Add(nextVoxel);
 
-                            if (z == startLoc.z && nextVoxel.gridLoc.x > xExtent) xExtent = nextVoxel.gridLoc.x;
-                            if (z == startLoc.z && nextVoxel.gridLoc.x == xExtent) yExtent = nextVoxel.gridLoc.y;
-                            if (nextVoxel.gridLoc.x == xExtent && nextVoxel.gridLoc.y == yExtent) zExtent = nextVoxel.gridLoc.z;
+                            if (z == startLoc.z && y == startLoc.y && nextVoxel.gridLoc.x > extent.x)
+                            {
+                                extent.x = nextVoxel.gridLoc.x;
+                                groupDimensions.x++;
+                            }
+
+                            if (z == startLoc.z && nextVoxel.gridLoc.x == extent.x && nextVoxel.gridLoc.y > extent.y)
+                            {
+                                extent.y = nextVoxel.gridLoc.y;
+                                groupDimensions.y++;
+                            }
+
+                            if (nextVoxel.gridLoc.x == extent.x && nextVoxel.gridLoc.y == extent.y && nextVoxel.gridLoc.z > extent.z)
+                            {
+                                extent.z = nextVoxel.gridLoc.z;
+                                groupDimensions.z++;
+                            }
                         }
                         else break;
                     }
                 }
             }
 
-            Debug.Log($"xExt: {xExtent} yExt: {yExtent} zExt: {zExtent}");
+            Debug.Log($"xExt: {extent.x} yExt: {extent.y} zExt: {extent.z}");
 
-            voxelGroup.RemoveAll(v => v.gridLoc.x > xExtent || v.gridLoc.y > yExtent || v.gridLoc.z > zExtent);
+            // VET ALL VOXELS NOT WITHIN BOUNDS
+            voxelGroup.RemoveAll(v => v.gridLoc.x > extent.x || v.gridLoc.y > extent.y || v.gridLoc.z > extent.z);
 
             for (int i = 0; i < voxelGroup.Count; i++)
             {
                 Debug.Log(voxelGroup[i].gridLoc);
             }
 
-            //Debug.Log($"nb.z = {newBounds.z}");
+            return new VoxelPayload(voxelGroup, groupDimensions);
+        }
 
-            var voxelsNBZ = voxelGroup.FindAll(v => v.gridLoc.z == startLoc.z);
+        private void CreateVerticesAndTriangles(VoxelPayload vP)
+        {
+            Voxel voxBLZ =  vP.voxelGroup[vP.groupDimensions.x + vP.groupDimensions.z * vP.bounds.x * vP.bounds.y];
+            Voxel voxTLZ =  vP.voxelGroup[vP.voxelGroup.Count - 1];
+            Voxel voxBRZ =  vP.voxelGroup[vP.groupDimensions.z * vP.bounds.x * vP.bounds.y];
+            Voxel voxTRZ =  vP.voxelGroup[vP.groupDimensions.y * vP.bounds.x + vP.groupDimensions.z * vP.bounds.x * vP.bounds.y];
+                                                
+            Voxel voxBLZn = vP.voxelGroup[0];
+            Voxel voxTLZn = vP.voxelGroup[vP.groupDimensions.y * vP.bounds.x];
+            Voxel voxBRZn = vP.voxelGroup[vP.groupDimensions.x];
+            Voxel voxTRZn = vP.voxelGroup[vP.groupDimensions.x + vP.groupDimensions.y * vP.bounds.x];
 
-            for (int i = 0; i < voxelsNBZ.Count; i++)
+            /*Vector3 bLZ = voxelGroup.Find(v => v.gridLoc.x == xExtent && v.gridLoc.y == startLoc.y && v.gridLoc.z == zExtent).faces[0].vertices[0];
+            Vector3 tLZ = voxelGroup.Find(v => v.gridLoc.x == xExtent && v.gridLoc.y == yExtent && v.gridLoc.z == zExtent).faces[0].vertices[1];
+            Vector3 bRZ = voxelGroup.Find(v => v.gridLoc.x == startLoc.x && v.gridLoc.y == startLoc.y && v.gridLoc.z == zExtent).faces[0].vertices[2];
+            Vector3 tRZ = voxelGroup.Find(v => v.gridLoc.x == startLoc.x && v.gridLoc.y == yExtent && v.gridLoc.z == zExtent).faces[0].vertices[3];
+
+            Vector3 bLZm = voxelGroup.Find(v => v.gridLoc == startLoc).faces[1].vertices[0];
+            Vector3 tLZm = voxelGroup.Find(v => v.gridLoc.z == startLoc.z && v.gridLoc.x == startLoc.x && v.gridLoc.y == yExtent).faces[1].vertices[1];
+            Vector3 bRZm = voxelGroup.Find(v => v.gridLoc.x == xExtent && v.gridLoc.y == startLoc.y && v.gridLoc.z == startLoc.z).faces[1].vertices[2];
+            Vector3 tRZm = voxelGroup.Find(v => v.gridLoc.x == xExtent && v.gridLoc.y == xExtent && v.gridLoc.z == startLoc.z).faces[1].vertices[3];*/
+
+            /* GET VERTICES
+            // /* Z FACE 
+            Vector3 z1 = voxelGroup.Find(v => v.gridLoc.x == xExtent && v.gridLoc.y == startLoc.y && v.gridLoc.z == zExtent).faces[0].vertices[0];
+            Vector3 z2 = voxelGroup.Find(v => v.gridLoc.x == xExtent && v.gridLoc.y == yExtent && v.gridLoc.z == zExtent).faces[0].vertices[1];
+            Vector3 z3 = voxelGroup.Find(v => v.gridLoc.x == startLoc.x && v.gridLoc.y == startLoc.y && v.gridLoc.z == zExtent).faces[0].vertices[2];
+            Vector3 z4 = voxelGroup.Find(v => v.gridLoc.x == startLoc.x && v.gridLoc.y == yExtent && v.gridLoc.z == zExtent).faces[0].vertices[3];
+            //
+
+
+            // /* ZM FACE
+            Vector3 zm1 = voxelGroup.Find(v => v.gridLoc == startLoc).faces[1].vertices[0];
+            Vector3 zm2 = voxelGroup.Find(v => v.gridLoc.x == startLoc.x && v.gridLoc.y == yExtent && v.gridLoc.z == startLoc.z).faces[1].vertices[1];
+            Vector3 zm3 = voxelGroup.Find(v => v.gridLoc.x == xExtent && v.gridLoc.z == startLoc.z).faces[1].vertices[2];
+            Vector3 zm4 = voxelGroup.Find(v => v.gridLoc.x == xExtent && v.gridLoc.y == yExtent && v.gridLoc.z == startLoc.z).faces[1].vertices[3];
+            //
+
+            // /* X FACE
+            Vector3 x1 = voxelGroup.Find(v => v.gridLoc.x == xExtent).faces[3].vertices[0];
+            Vector3 x2 = voxelGroup.Find(v => v.gridLoc.x == startLoc.x && v.gridLoc.y == yExtent && v.gridLoc.z == startLoc.z).faces[3].vertices[1];
+            Vector3 x3 = voxelGroup.Find(v => v.gridLoc.x == xExtent && v.gridLoc.z == startLoc.z).faces[3].vertices[2];
+            Vector3 x4 = voxelGroup.Find(v => v.gridLoc.x == xExtent && v.gridLoc.y == yExtent && v.gridLoc.z == startLoc.z).faces[3].vertices[3];
+            // */
+
+            vertices = new()
             {
-                Debug.Log(voxelsNBZ[i].gridLoc);
+                // Zn
+                voxBLZ.faces[0].vertices[0],
+                voxTLZ.faces[0].vertices[1],
+                voxBRZ.faces[0].vertices[2],
+                voxTRZ.faces[0].vertices[3],
+
+                // Zn
+                voxBLZn.faces[1].vertices[0],
+                voxTLZn.faces[1].vertices[1],
+                voxBRZn.faces[1].vertices[2],
+                voxTRZn.faces[1].vertices[3],
+
+                // X
+                voxBRZn.faces[2].vertices[0],
+                voxTRZn.faces[2].vertices[1],
+                voxBLZ.faces[2].vertices[2],
+                voxTLZ.faces[2].vertices[3],
+
+                // Xn
+                voxBRZ.faces[3].vertices[0],
+                voxTRZ.faces[3].vertices[1],
+                voxBLZn.faces[3].vertices[2],
+                voxTLZn.faces[3].vertices[3],
+
+                // Y
+                voxTLZn.faces[4].vertices[0],
+                voxTRZ.faces[4].vertices[1],
+                voxTRZn.faces[4].vertices[2],
+                voxTLZ.faces[4].vertices[3],
+
+                // Yn
+                voxBRZ.faces[5].vertices[0],
+                voxBLZn.faces[5].vertices[1],
+                voxBLZ.faces[5].vertices[2],
+                voxBLZn.faces[5].vertices[3]
+            };
+
+            triangles = new()
+            {
+                // Z
+                0, 1, 2, 2, 1, 3,
+
+                // Zm
+                4, 5, 6, 6, 5, 7,
+
+                // X
+                8, 9, 10, 10, 9, 11,
+
+                // Xm
+                12, 13, 14, 14, 13, 15,
+
+                // Y
+                16, 17, 18, 18, 17, 19,
+
+                // Ym
+                20, 21, 22, 22, 21, 23
+            };
+        }
+
+        private void OptimiseMesh(ref int voxelsRendered, ref List<Voxel>invalidVoxels)
+        {
+            var startVoxel = FindValidVoxel(invalidVoxels);
+
+            VoxelPayload vP = FindVoxelsToOptimise(startVoxel, invalidVoxels);
+
+            if (vP.voxelGroup.Count == 0) return;
+
+            CreateVerticesAndTriangles(vP);
+
+            voxelsRendered += vP.voxelGroup.Count;
+            invalidVoxels.AddRange(vP.voxelGroup);
+        }
+
+        private void CreateOptimisedMeshData()
+        {
+            int voxelsRendered = 0;
+            List<Voxel> invalidVoxels = new();
+
+            while (voxelsRendered < renderingVoxels)
+            {
+                OptimiseMesh(ref voxelsRendered, ref invalidVoxels);
+                if (renderingVoxels == voxels.Count()) break;
             }
+        }
 
-            // GET VERTEXES
-
+        private void SupplyFaces()
+        {
+            renderingVoxels = 0;
+            for (int i = 0; i < voxels.Length; i++)
+            {
+                voxels[i].SupplyVisibleFaces();
+                renderingVoxels++;
+            }
         }
 
         private void GenerateMesh()
@@ -263,17 +376,23 @@ namespace Essence.Voxel
             vertices.Clear();
             triangles.Clear();
 
-            renderingVoxels = 0;
-
-            FindRenderingVoxel();
-
-            for (int i = 0; i < voxels.Length; i++)
-            {
-                voxels[i].SupplyVisibleFaces();
-                renderingVoxels++;
-            }
+            CreateOptimisedMeshData();
 
             GenerateMesh();
         }
     }
+}
+
+public struct VoxelPayload
+{
+    public VoxelPayload(List<Voxel> voxelGroup, Vector3Int groupDimensions)
+    {
+        this.voxelGroup = voxelGroup;
+        this.groupDimensions = groupDimensions;
+        bounds = new(groupDimensions.x + 1, groupDimensions.y + 1, groupDimensions.z + 1);
+    }
+
+    public List<Voxel> voxelGroup;
+    public Vector3Int groupDimensions;
+    public Vector3Int bounds;
 }

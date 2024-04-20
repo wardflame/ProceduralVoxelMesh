@@ -60,7 +60,7 @@ namespace Essence.Voxel
 
             faces[1] = new VoxelFace
                 (
-                    VoxelFacing.Zm,
+                    VoxelFacing.Zn,
                     new Vector3[]
                     {
                         new Vector3(voxelPos.x - voxelHalfSize, voxelPos.y - voxelHalfSize, voxelPos.z - voxelHalfSize), // 0
@@ -84,7 +84,7 @@ namespace Essence.Voxel
 
             faces[3] = new VoxelFace
                 (
-                    VoxelFacing.Xm,
+                    VoxelFacing.Xn,
                     new Vector3[]
                     {
                         new Vector3(voxelPos.x - voxelHalfSize, voxelPos.y - voxelHalfSize, voxelPos.z + voxelHalfSize), // 0
@@ -108,7 +108,7 @@ namespace Essence.Voxel
 
             faces[5] = new VoxelFace
                 (
-                    VoxelFacing.Ym,
+                    VoxelFacing.Yn,
                     new Vector3[]
                     {
                         new Vector3(voxelPos.x - voxelHalfSize, voxelPos.y - voxelHalfSize, voxelPos.z + voxelHalfSize), // 0
@@ -205,10 +205,10 @@ namespace Essence.Voxel
     public enum VoxelFacing
     {
         Z,
-        Zm,
+        Zn,
         X,
-        Xm,
+        Xn,
         Y,
-        Ym
+        Yn
     }
 }

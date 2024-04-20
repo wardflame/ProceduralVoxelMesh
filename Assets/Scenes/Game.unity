@@ -518,7 +518,7 @@ MonoBehaviour:
   voxelSize: 1
   vertices: []
   triangles: 
-  optimiseMesh: 0
+  optimiseMesh: 1
 --- !u!23 &1638108586
 MeshRenderer:
   m_ObjectHideFlags: 0
