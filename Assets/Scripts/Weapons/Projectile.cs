@@ -17,6 +17,8 @@ namespace Essence.Weapons
         public float velocity;
         public float lifetime;
 
+        public int penetrativePower;
+
         private Vector3 startPosition;
         private Vector3 startForward;
 
@@ -27,7 +29,7 @@ namespace Essence.Weapons
 
         private bool hasHit;
 
-        private int environmentLayer;
+        private int objectsHit;
 
         private void Awake()
         {
@@ -40,7 +42,8 @@ namespace Essence.Weapons
 
         private void FixedUpdate()
         {
-            if (!hasHit) MoveProjectile();
+            //if (!hasHit)
+                MoveProjectile();
         }
 
         private void MoveProjectile()
@@ -59,6 +62,15 @@ namespace Essence.Weapons
                 {
                     Debug.Log("HIT CURRENT!");
                     OnHit(previousHit);
+                    
+                    objectsHit++;
+
+                    if (objectsHit > penetrativePower)
+                    {
+                        hasHit = true;
+                        Destroy(gameObject, .025f);
+                        return;
+                    }
                 }
             }
 
@@ -68,6 +80,15 @@ namespace Essence.Weapons
             {
                 Debug.Log("HIT PREVIOUS!");
                 OnHit(currentHit);
+
+                objectsHit++;
+
+                if (objectsHit > penetrativePower)
+                {
+                    hasHit = true;
+                    Destroy(gameObject, .025f);
+                    return;
+                }
             }
 
             previousPosition = currentPosition;
@@ -88,31 +109,31 @@ namespace Essence.Weapons
 
         private void OnHit(RaycastHit hit)
         {
-            hasHit = true;
-
             transform.position = hit.point;
 
-            // Environment check
-            if (hit.collider.CompareTag("Voxel"))
+            hasHit = true;
+
+            switch (hit.collider.tag)
             {
-                var vMan = hit.collider.GetComponent<VoxelMeshManager>();
-                vMan.DisableVoxel(hit.point - hit.normal * .05f);
+                case "Voxel":
+                    var vMan = hit.collider.GetComponent<VoxelMeshManager>();
+                    vMan.DisableVoxel(hit.point - hit.normal * .05f);
+
+                    break;
+
+                case "Entity":
+                    Entity entity = hit.collider.gameObject.GetComponentInParent<Entity>();
+                    if (entity) entity.DamageHealth(damage);
+
+                    break;
+
+                case "Environment":
+                    hasHit = true;
+                    Destroy(gameObject, .025f);
+                    break;
             }
-
-            // Entity check
-            Entity entity = hit.collider.gameObject.GetComponentInParent<Entity>();
-            if (entity) entity.DamageHealth(damage);
-
+            
             // FX COROUTINE
-
-            StartCoroutine(DestroyProjectile());
-        }
-
-        private IEnumerator DestroyProjectile()
-        {
-            yield return new WaitForSeconds(.025f);
-
-            Destroy(gameObject);
         }
     }
 }
