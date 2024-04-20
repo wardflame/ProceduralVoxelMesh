@@ -34,7 +34,6 @@ namespace Essence.Voxel
         {
             InitFaces();
             InitNeighbours();
-            SupplyVisibleFaces();
         }
 
         private void InitFaces()

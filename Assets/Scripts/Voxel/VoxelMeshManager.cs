@@ -111,8 +111,6 @@ namespace Essence.Voxel
 
         private VoxelPayload FindVoxelsToOptimise(Voxel startVoxel, List<Voxel> invalidVoxels)
         {
-            Debug.Log($"Start Voxel: {startVoxel.gridLoc}");
-
             if (startVoxel == null || !startVoxel.rendering) Debug.Log("Couldn't find Voxel");
 
             // ITERATE AND FIND VOXELS TO MAKE A NEW SUB-CUBE
@@ -152,20 +150,18 @@ namespace Essence.Voxel
                                 groupDimensions.z++;
                             }
                         }
-                        else break;
+                        else
+                        {
+                            x = dimensions.x;
+                            y = dimensions.y;
+                            z = dimensions.z;
+                        }
                     }
                 }
             }
 
-            Debug.Log($"xExt: {extent.x} yExt: {extent.y} zExt: {extent.z}");
-
             // VET ALL VOXELS NOT WITHIN BOUNDS
             voxelGroup.RemoveAll(v => v.gridLoc.x > extent.x || v.gridLoc.y > extent.y || v.gridLoc.z > extent.z);
-
-            for (int i = 0; i < voxelGroup.Count; i++)
-            {
-                Debug.Log(voxelGroup[i].gridLoc);
-            }
 
             return new VoxelPayload(voxelGroup, groupDimensions);
         }
@@ -182,40 +178,7 @@ namespace Essence.Voxel
             Voxel voxBRZn = vP.voxelGroup[vP.groupDimensions.x];
             Voxel voxTRZn = vP.voxelGroup[vP.groupDimensions.x + vP.groupDimensions.y * vP.bounds.x];
 
-            /*Vector3 bLZ = voxelGroup.Find(v => v.gridLoc.x == xExtent && v.gridLoc.y == startLoc.y && v.gridLoc.z == zExtent).faces[0].vertices[0];
-            Vector3 tLZ = voxelGroup.Find(v => v.gridLoc.x == xExtent && v.gridLoc.y == yExtent && v.gridLoc.z == zExtent).faces[0].vertices[1];
-            Vector3 bRZ = voxelGroup.Find(v => v.gridLoc.x == startLoc.x && v.gridLoc.y == startLoc.y && v.gridLoc.z == zExtent).faces[0].vertices[2];
-            Vector3 tRZ = voxelGroup.Find(v => v.gridLoc.x == startLoc.x && v.gridLoc.y == yExtent && v.gridLoc.z == zExtent).faces[0].vertices[3];
-
-            Vector3 bLZm = voxelGroup.Find(v => v.gridLoc == startLoc).faces[1].vertices[0];
-            Vector3 tLZm = voxelGroup.Find(v => v.gridLoc.z == startLoc.z && v.gridLoc.x == startLoc.x && v.gridLoc.y == yExtent).faces[1].vertices[1];
-            Vector3 bRZm = voxelGroup.Find(v => v.gridLoc.x == xExtent && v.gridLoc.y == startLoc.y && v.gridLoc.z == startLoc.z).faces[1].vertices[2];
-            Vector3 tRZm = voxelGroup.Find(v => v.gridLoc.x == xExtent && v.gridLoc.y == xExtent && v.gridLoc.z == startLoc.z).faces[1].vertices[3];*/
-
-            /* GET VERTICES
-            // /* Z FACE 
-            Vector3 z1 = voxelGroup.Find(v => v.gridLoc.x == xExtent && v.gridLoc.y == startLoc.y && v.gridLoc.z == zExtent).faces[0].vertices[0];
-            Vector3 z2 = voxelGroup.Find(v => v.gridLoc.x == xExtent && v.gridLoc.y == yExtent && v.gridLoc.z == zExtent).faces[0].vertices[1];
-            Vector3 z3 = voxelGroup.Find(v => v.gridLoc.x == startLoc.x && v.gridLoc.y == startLoc.y && v.gridLoc.z == zExtent).faces[0].vertices[2];
-            Vector3 z4 = voxelGroup.Find(v => v.gridLoc.x == startLoc.x && v.gridLoc.y == yExtent && v.gridLoc.z == zExtent).faces[0].vertices[3];
-            //
-
-
-            // /* ZM FACE
-            Vector3 zm1 = voxelGroup.Find(v => v.gridLoc == startLoc).faces[1].vertices[0];
-            Vector3 zm2 = voxelGroup.Find(v => v.gridLoc.x == startLoc.x && v.gridLoc.y == yExtent && v.gridLoc.z == startLoc.z).faces[1].vertices[1];
-            Vector3 zm3 = voxelGroup.Find(v => v.gridLoc.x == xExtent && v.gridLoc.z == startLoc.z).faces[1].vertices[2];
-            Vector3 zm4 = voxelGroup.Find(v => v.gridLoc.x == xExtent && v.gridLoc.y == yExtent && v.gridLoc.z == startLoc.z).faces[1].vertices[3];
-            //
-
-            // /* X FACE
-            Vector3 x1 = voxelGroup.Find(v => v.gridLoc.x == xExtent).faces[3].vertices[0];
-            Vector3 x2 = voxelGroup.Find(v => v.gridLoc.x == startLoc.x && v.gridLoc.y == yExtent && v.gridLoc.z == startLoc.z).faces[3].vertices[1];
-            Vector3 x3 = voxelGroup.Find(v => v.gridLoc.x == xExtent && v.gridLoc.z == startLoc.z).faces[3].vertices[2];
-            Vector3 x4 = voxelGroup.Find(v => v.gridLoc.x == xExtent && v.gridLoc.y == yExtent && v.gridLoc.z == startLoc.z).faces[3].vertices[3];
-            // */
-
-            vertices = new()
+            Vector3[] verts =
             {
                 // Zn
                 voxBLZ.faces[0].vertices[0],
@@ -251,29 +214,62 @@ namespace Essence.Voxel
                 voxBRZ.faces[5].vertices[0],
                 voxBLZn.faces[5].vertices[1],
                 voxBLZ.faces[5].vertices[2],
-                voxBLZn.faces[5].vertices[3]
+                voxBRZn.faces[5].vertices[3]
             };
 
-            triangles = new()
+            int[] tris =
             {
                 // Z
-                0, 1, 2, 2, 1, 3,
+                vertices.Count,
+                vertices.Count + 1,
+                vertices.Count + 2,
+                vertices.Count + 2,
+                vertices.Count + 1,
+                vertices.Count + 3,
 
                 // Zm
-                4, 5, 6, 6, 5, 7,
+                vertices.Count + 4,
+                vertices.Count + 5,
+                vertices.Count + 6,
+                vertices.Count + 6,
+                vertices.Count + 5,
+                vertices.Count + 7,
 
                 // X
-                8, 9, 10, 10, 9, 11,
+                vertices.Count + 8,
+                vertices.Count + 9,
+                vertices.Count + 10,
+                vertices.Count + 10,
+                vertices.Count + 9,
+                vertices.Count + 11,
 
                 // Xm
-                12, 13, 14, 14, 13, 15,
+                vertices.Count + 12,
+                vertices.Count + 13,
+                vertices.Count + 14,
+                vertices.Count + 14,
+                vertices.Count + 13,
+                vertices.Count + 15,
 
                 // Y
-                16, 17, 18, 18, 17, 19,
+                vertices.Count + 16,
+                vertices.Count + 17,
+                vertices.Count + 18,
+                vertices.Count + 18,
+                vertices.Count + 17,
+                vertices.Count + 19,
 
                 // Ym
-                20, 21, 22, 22, 21, 23
+                vertices.Count + 20,
+                vertices.Count + 21,
+                vertices.Count + 22,
+                vertices.Count + 22,
+                vertices.Count + 21,
+                vertices.Count + 23
             };
+
+            vertices.AddRange(verts);
+            triangles.AddRange(tris);
         }
 
         private void OptimiseMesh(ref int voxelsRendered, ref List<Voxel>invalidVoxels)
@@ -349,13 +345,9 @@ namespace Essence.Voxel
             var distanceY = Mathf.Abs(worldPosition.y - startPos.y);
             var distanceZ = Mathf.Abs(worldPosition.z - startPos.z);
 
-            Debug.Log($"ABS: {distanceX}, {distanceY}, {distanceZ}");
-
             int x = Mathf.RoundToInt(distanceX * WorldToGrid);
             int y = Mathf.RoundToInt(distanceY * WorldToGrid);
             int z = Mathf.RoundToInt(distanceZ * WorldToGrid);
-
-            Debug.Log($"ROUNDED: {x}, {y}, {z}");
 
             return GetVoxel(x, y, z);
         }
