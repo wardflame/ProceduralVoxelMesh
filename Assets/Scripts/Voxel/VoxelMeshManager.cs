@@ -1,7 +1,7 @@
-using Essence.Voxel;
 using System.Collections.Generic;
 using System.Linq;
-using TMPro;
+using Unity.Burst;
+using Unity.Jobs;
 using UnityEngine;
 
 namespace Essence.Voxel
@@ -9,8 +9,6 @@ namespace Essence.Voxel
     [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
     public class VoxelMeshManager : MonoBehaviour
     {
-        //public GameObject cube;
-
         public Mesh mesh;
 
         [Header("MESH DIMENSIONS (in voxels)")]
@@ -153,8 +151,7 @@ namespace Essence.Voxel
                         else
                         {
                             x = dimensions.x;
-                            y = dimensions.y;
-                            z = dimensions.z;
+                            if (nextVoxel.gridLoc.x <= extent.x) y = dimensions.y;
                         }
                     }
                 }
@@ -168,11 +165,11 @@ namespace Essence.Voxel
 
         private void CreateVerticesAndTriangles(VoxelPayload vP)
         {
-            Voxel voxBLZ =  vP.voxelGroup[vP.groupDimensions.x + vP.groupDimensions.z * vP.bounds.x * vP.bounds.y];
-            Voxel voxTLZ =  vP.voxelGroup[vP.voxelGroup.Count - 1];
-            Voxel voxBRZ =  vP.voxelGroup[vP.groupDimensions.z * vP.bounds.x * vP.bounds.y];
-            Voxel voxTRZ =  vP.voxelGroup[vP.groupDimensions.y * vP.bounds.x + vP.groupDimensions.z * vP.bounds.x * vP.bounds.y];
-                                                
+            Voxel voxBLZ = vP.voxelGroup[vP.groupDimensions.x + vP.groupDimensions.z * vP.bounds.x * vP.bounds.y];
+            Voxel voxTLZ = vP.voxelGroup[vP.voxelGroup.Count - 1];
+            Voxel voxBRZ = vP.voxelGroup[vP.groupDimensions.z * vP.bounds.x * vP.bounds.y];
+            Voxel voxTRZ = vP.voxelGroup[vP.groupDimensions.y * vP.bounds.x + vP.groupDimensions.z * vP.bounds.x * vP.bounds.y];
+
             Voxel voxBLZn = vP.voxelGroup[0];
             Voxel voxTLZn = vP.voxelGroup[vP.groupDimensions.y * vP.bounds.x];
             Voxel voxBRZn = vP.voxelGroup[vP.groupDimensions.x];
@@ -180,7 +177,7 @@ namespace Essence.Voxel
 
             Vector3[] verts =
             {
-                // Zn
+                // Z
                 voxBLZ.faces[0].vertices[0],
                 voxTLZ.faces[0].vertices[1],
                 voxBRZ.faces[0].vertices[2],
@@ -272,7 +269,7 @@ namespace Essence.Voxel
             triangles.AddRange(tris);
         }
 
-        private void OptimiseMesh(ref int voxelsRendered, ref List<Voxel>invalidVoxels)
+        private void OptimiseMesh(ref int voxelsRendered, ref List<Voxel> invalidVoxels)
         {
             var startVoxel = FindValidVoxel(invalidVoxels);
 
@@ -294,7 +291,7 @@ namespace Essence.Voxel
             while (voxelsRendered < renderingVoxels)
             {
                 OptimiseMesh(ref voxelsRendered, ref invalidVoxels);
-                if (renderingVoxels == voxels.Count()) break;
+                if (renderingVoxels == voxels.Count() || invalidVoxels.Count == renderingVoxels) break;
             }
         }
 
