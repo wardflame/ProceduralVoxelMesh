@@ -513,7 +513,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mesh: {fileID: 0}
-  dimensions: {x: 25, y: 10, z: 3}
+  dimensions: {x: 3, y: 3, z: 3}
   offset: {x: 0, y: 0.25, z: 0}
   voxelSize: 0.5
   vertices: []
@@ -726,9 +726,9 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 531050398}
   - {fileID: 832575519}
   - {fileID: 410087041}
+  - {fileID: 531050398}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1994108256
