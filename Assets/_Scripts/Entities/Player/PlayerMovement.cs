@@ -17,12 +17,13 @@ namespace Essence.Entities.Player
         public Vector3 currentSpeed;
         public float inertia;
 
-        private bool isMoving;
+        public bool isMoving;
 
         private Animator animator;
         private int animHashVelocityX;
         private int animHashVelocityY;
 
+        private Vector3 velocity;
 
         private void Awake()
         {
@@ -48,9 +49,10 @@ namespace Essence.Entities.Player
         {
             Vector3 forwardDir = input.z * kernel.cameraMain.transform.forward;
             Vector3 rightDir = input.x * kernel.cameraMain.transform.right;
-            var newDir = (forwardDir + rightDir).normalized;
+            var newDir = (forwardDir + rightDir) * moveSpeed;
+            newDir.y = 0;
 
-            if (isMoving)
+            /*if (isMoving)
             {
                 // Inertia: Acceleration
                 if (currentSpeed.magnitude < newDir.magnitude)
@@ -83,7 +85,26 @@ namespace Essence.Entities.Player
 
                     controller.SimpleMove(currentSpeed * moveSpeed);
                 }
+            }*/
+
+            if (isMoving)
+            {
+                inertia += Time.deltaTime * acceleration;
+                if (inertia > 1) inertia = 1;
+
+                currentSpeed = Vector3.SmoothDamp(currentSpeed, newDir, ref velocity, acceleration);
             }
+            else
+            {
+                inertia -= Time.deltaTime * deceleration;
+                if (inertia < 0) inertia = 0;
+
+                currentSpeed = Vector3.SmoothDamp(currentSpeed, Vector3.zero, ref velocity, deceleration);
+            }
+
+            Debug.Log(currentSpeed);
+
+            controller.SimpleMove(currentSpeed);
 
             var cSpeed = input * inertia;
 

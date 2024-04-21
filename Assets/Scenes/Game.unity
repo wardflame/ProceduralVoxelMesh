@@ -361,6 +361,12 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 731893176031900931, guid: c56df8723cf6b4c459c8848652b713d9,
+        type: 3}
+      propertyPath: currentWeapon
+      value: 
+      objectReference: {fileID: 7386697024502318697, guid: bfe1deca263c5ab46b64a426ce7a3993,
+        type: 3}
     - target: {fileID: 5438632223927305619, guid: c56df8723cf6b4c459c8848652b713d9,
         type: 3}
       propertyPath: m_Name
@@ -415,6 +421,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8124672110483789664, guid: c56df8723cf6b4c459c8848652b713d9,
+        type: 3}
+      propertyPath: acceleration
+      value: 1.5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

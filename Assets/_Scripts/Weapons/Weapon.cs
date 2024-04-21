@@ -7,33 +7,20 @@ namespace Essence.Weapons
 {
     public class Weapon : MonoBehaviour
     {
-        public PlayerKernel kernel;
-
+        public WeaponType type;
         public Transform firePoint;
-        public GameObject ammoPrefab;
+        public WeaponMagazine magazine;
 
-        private void Awake()
+        public void FireWeapon()
         {
-            kernel = GetComponentInParent<PlayerKernel>();
-            kernel.currentWeapon = this;
-
-            kernel.input.Combat.Fire.performed += OnFirePerformed;
-
-            //StartCoroutine(DistanceTick());
+            Instantiate(magazine.currentAmmo, firePoint.position, firePoint.rotation);
         }
+    }
 
-        private IEnumerator DistanceTick()
-        {
-            while (true)
-            {
-                Debug.Log("Distance = " + Vector3.Distance(firePoint.position, kernel.aimTarget.targetTransform.position));
-                yield return new WaitForSeconds(1);
-            }
-        }
-
-        private void OnFirePerformed(InputAction.CallbackContext value)
-        {
-            Instantiate(ammoPrefab, firePoint.position, firePoint.rotation);
-        }
+    public enum WeaponType
+    {
+        Primary,
+        Secondary,
+        Tertiary
     }
 }

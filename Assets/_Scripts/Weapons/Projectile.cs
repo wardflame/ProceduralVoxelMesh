@@ -67,7 +67,6 @@ namespace Essence.Weapons
 
                     if (objectsHit > penetrativePower)
                     {
-                        hasHit = true;
                         Destroy(gameObject, .025f);
                         return;
                     }
@@ -85,7 +84,6 @@ namespace Essence.Weapons
 
                 if (objectsHit > penetrativePower)
                 {
-                    hasHit = true;
                     Destroy(gameObject, .025f);
                     return;
                 }
@@ -122,8 +120,8 @@ namespace Essence.Weapons
                     break;
 
                 case "Entity":
-                    Entity entity = hit.collider.gameObject.GetComponentInParent<Entity>();
-                    if (entity) entity.DamageHealth(damage);
+                    EntityKernel entity = hit.collider.gameObject.GetComponentInParent<EntityKernel>();
+                    if (entity) entity.Health.DamageHealth(damage);
 
                     break;
 
