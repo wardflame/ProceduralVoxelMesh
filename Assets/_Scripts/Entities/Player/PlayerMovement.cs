@@ -1,3 +1,4 @@
+using Codice.Client.BaseCommands.Triggers;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -52,61 +53,18 @@ namespace Essence.Entities.Player
             var newDir = (forwardDir + rightDir) * moveSpeed;
             newDir.y = 0;
 
-            /*if (isMoving)
-            {
-                // Inertia: Acceleration
-                if (currentSpeed.magnitude < newDir.magnitude)
-                {
-                    inertia += Time.deltaTime * acceleration;
-                    currentSpeed = Vector3.Lerp(currentSpeed, newDir, inertia);
-                }
-                else
-                {
-                    inertia = 1;
-                    currentSpeed = newDir;
-                }
-
-                controller.SimpleMove(currentSpeed * moveSpeed);
-            }
-            else if (!isMoving)
-            {
-                // Inertia: Deceleration
-                if (currentSpeed.magnitude > 0)
-                {
-                    inertia -= Time.deltaTime * deceleration;
-                    currentSpeed = Vector3.Lerp(Vector3.zero, currentSpeed, inertia);
-
-                    controller.SimpleMove(currentSpeed * moveSpeed);
-                }
-                else
-                {
-                    inertia = 0;
-                    currentSpeed = Vector3.zero;
-
-                    controller.SimpleMove(currentSpeed * moveSpeed);
-                }
-            }*/
-
             if (isMoving)
             {
-                inertia += Time.deltaTime * acceleration;
-                if (inertia > 1) inertia = 1;
-
                 currentSpeed = Vector3.SmoothDamp(currentSpeed, newDir, ref velocity, acceleration);
             }
             else
             {
-                inertia -= Time.deltaTime * deceleration;
-                if (inertia < 0) inertia = 0;
-
                 currentSpeed = Vector3.SmoothDamp(currentSpeed, Vector3.zero, ref velocity, deceleration);
             }
-
-            Debug.Log(currentSpeed);
-
+            
             controller.SimpleMove(currentSpeed);
 
-            var cSpeed = input * inertia;
+            var cSpeed = input;
 
             animator.SetFloat(animHashVelocityX, cSpeed.x);
             animator.SetFloat(animHashVelocityY, cSpeed.z);
