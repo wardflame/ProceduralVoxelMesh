@@ -6,6 +6,7 @@ namespace Essence.Weapons
 {
     public class Weapon : MonoBehaviour, IInteractable
     {
+        public string weaponName;
         public WeaponType type;
         public Transform firePoint;
         public WeaponMagazine magazine;
@@ -19,6 +20,8 @@ namespace Essence.Weapons
             fireFX.Play();
         }
 
+        public string Prompt => $"Press E to pick up {weaponName}";
+
         public void OnInteract(GameObject interactor)
         {
             var player = interactor.GetComponent<PlayerInteractor>();
@@ -26,6 +29,7 @@ namespace Essence.Weapons
             {
                 player.kernel.shooter.AddWeapon(this);
                 GetComponent<Rigidbody>().isKinematic = true;
+                tag = "Player";
             }
         }
     }

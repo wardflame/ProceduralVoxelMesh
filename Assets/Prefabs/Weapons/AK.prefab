@@ -300,6 +300,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 448b100e3832ac848a21d995961340eb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  weaponName: Kalashnikov
   type: 0
   firePoint: {fileID: 3957325742571031247}
   magazine: {fileID: 6356086100795897517}

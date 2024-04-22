@@ -1,4 +1,5 @@
 using Essence.Entities;
+using Essence.Entities.Generic;
 using Essence.Voxel;
 using UnityEngine;
 
@@ -10,13 +11,11 @@ namespace Essence.Weapons
 
         public float damage;
 
-        public float impactRadius = 0.25f;
-        public float impaceForce = 1f;
-
         public float velocity;
         public float lifetime;
 
         public int penetrativePower;
+        public int destructivePower;
 
         private Vector3 startPosition;
         private Vector3 startForward;
@@ -112,14 +111,19 @@ namespace Essence.Weapons
             switch (hit.collider.tag)
             {
                 case "Voxel":
+                    if (penetrativePower <= 0) return;
+
                     var vMan = hit.collider.GetComponent<VoxelMeshManager>();
-                    vMan.DisableVoxel(hit.point - hit.normal * .05f);
+                    var worldPoint = hit.point - hit.normal * .05f;
+
+                    if (destructivePower > 0) vMan.ExplodeVoxels(worldPoint, destructivePower);
+                    else vMan.DisableVoxel(worldPoint);
 
                     break;
 
                 case "Entity":
-                    EntityKernel entity = hit.collider.gameObject.GetComponent<EntityKernel>();
-                    if (entity) entity.Health.DamageHealth(damage);
+                    EntityHealth entity = hit.collider.gameObject.GetComponent<EntityHealth>();
+                    if (entity) entity.DamageHealth(damage);
 
                     break;
 

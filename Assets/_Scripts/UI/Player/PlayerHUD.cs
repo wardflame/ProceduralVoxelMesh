@@ -8,6 +8,7 @@ namespace Essence.UI.Player
         public PlayerKernel player;
         public Canvas canvas;
         public RectTransform rectTransform;
+        public PlayerPrompt prompt;
 
         private void Awake()
         {
@@ -15,6 +16,7 @@ namespace Essence.UI.Player
 
             canvas = GetComponent<Canvas>();
             rectTransform = GetComponent<RectTransform>();
+            prompt = GetComponentInChildren<PlayerPrompt>();
         }
     }
 }

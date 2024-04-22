@@ -19,9 +19,10 @@ namespace Essence.Entities.Player
         private void OnTriggerEnter(Collider other)
         {
             var interactable = other.GetComponent<IInteractable>();
-            if (interactable != null)
+            if (interactable != null && !other.CompareTag("Player"))
             {
                 currentInteractable = interactable;
+                kernel.hud.prompt.ShowPrompt(currentInteractable.Prompt);
             }
         }
 
@@ -30,7 +31,11 @@ namespace Essence.Entities.Player
             var interactable = other.GetComponent<IInteractable>();
             if (interactable != null)
             {
-                if (interactable == currentInteractable) currentInteractable = null;
+                if (interactable == currentInteractable)
+                {
+                    currentInteractable = null;
+                    kernel.hud.prompt.HidePrompt();
+                }
             }
         }
 
@@ -40,6 +45,7 @@ namespace Essence.Entities.Player
             {
                 currentInteractable.OnInteract(gameObject);
                 currentInteractable = null;
+                kernel.hud.prompt.HidePrompt();
             }
         }
     }

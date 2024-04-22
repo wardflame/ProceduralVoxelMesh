@@ -128,10 +128,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4b7149a4f41adfc4e94bd7c635e01da5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  currentAmmo: {fileID: 5003574122754307128, guid: 0e604d4a71061bb4ca54706a0d16a82b,
+  currentAmmo: {fileID: 5003574122754307128, guid: 0e26634cd016997458007bb9d591ea26,
     type: 3}
   eligibleAmmo:
-  - {fileID: 5003574122754307128, guid: 0e604d4a71061bb4ca54706a0d16a82b, type: 3}
+  - {fileID: 5003574122754307128, guid: 0e26634cd016997458007bb9d591ea26, type: 3}
 --- !u!1 &1796147274914224015
 GameObject:
   m_ObjectHideFlags: 0
@@ -317,6 +317,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 448b100e3832ac848a21d995961340eb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  weaponName: Sniper Rifle
   type: 2
   firePoint: {fileID: 4090777866961479825}
   magazine: {fileID: 4597092707727392852}

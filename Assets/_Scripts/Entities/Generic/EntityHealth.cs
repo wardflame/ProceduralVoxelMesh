@@ -16,6 +16,8 @@ namespace Essence.Entities.Generic
             }
         }
 
+        public System.Action OnHit;
+
         [SerializeField]
         private float maxHealth;
 
@@ -27,6 +29,7 @@ namespace Essence.Entities.Generic
         public void DamageHealth(float damage)
         {
             HP -= damage;
+            OnHit?.Invoke();
         }
     }
 }

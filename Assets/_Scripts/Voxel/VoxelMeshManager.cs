@@ -358,6 +358,36 @@ namespace Essence.Voxel
             RefreshRenderData();
         }
 
+        public void ExplodeVoxels(Vector3 worldPosition, int layerAmount)
+        {
+            Voxel target = LocateVoxel(worldPosition);
+            target.rendering = false;
+
+            List<Voxel> disabledVoxels = new();
+            disabledVoxels.AddRange(target.neighbours);
+
+            int vCount;
+            int prevAm = 0;
+            for (int i = 0; i < layerAmount; ++i)
+            {
+                for (vCount = 0 + prevAm; vCount < disabledVoxels.Count; vCount++)
+                {
+                    List<Voxel> newL = new();
+                    if (disabledVoxels[vCount] != null) newL.AddRange(disabledVoxels[vCount].neighbours);
+                    prevAm = newL.Count;
+                }
+            }
+
+            for (int i = 0; i < disabledVoxels.Count; i++)
+            {
+                if (disabledVoxels[i] != null) disabledVoxels[i].rendering = false;
+            }
+
+            renderingVoxels -= disabledVoxels.Count;
+
+            RefreshRenderData();
+        }
+
         private void RefreshRenderData()
         {
             vertices.Clear();

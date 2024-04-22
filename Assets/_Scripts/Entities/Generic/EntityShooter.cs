@@ -23,7 +23,11 @@ namespace Essence.Entities.Generic
         private void Start()
         {
             kernel = GetComponent<EntityKernel>();
-            if (currentWeaponGOB != null) currentWeapon = currentWeaponGOB.GetComponent<Weapon>();
+            if (currentWeaponGOB != null)
+            {
+                currentWeapon = currentWeaponGOB.GetComponent<Weapon>();
+                currentWeapon.tag = kernel.gameObject.tag;
+            }
         }
 
         protected virtual void Update()

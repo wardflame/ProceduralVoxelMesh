@@ -9,6 +9,7 @@ TagManager:
   - Environment
   - Weapon
   - Interactable
+  - Entity
   layers:
   - Default
   - TransparentFX

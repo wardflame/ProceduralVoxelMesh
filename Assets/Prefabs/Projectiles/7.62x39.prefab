@@ -46,11 +46,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   damage: 2
-  impactRadius: 0.25
-  impaceForce: 10
   velocity: 600
   lifetime: 1
-  penetrativePower: 2
+  penetrativePower: 1
+  destructivePower: 0
 --- !u!1 &6215910417208996513
 GameObject:
   m_ObjectHideFlags: 0

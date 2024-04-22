@@ -1,5 +1,6 @@
 using Cinemachine;
 using Essence.Entities.Generic;
+using Essence.UI.Player;
 using UnityEngine;
 
 namespace Essence.Entities.Player
@@ -20,6 +21,8 @@ namespace Essence.Entities.Player
 
         public PlayerInteractor interactor;
 
+        public PlayerHUD hud;
+
         private void Awake()
         {
             Debug.Log("Kernel");
@@ -31,6 +34,7 @@ namespace Essence.Entities.Player
             controller = GetComponent<CharacterController>();
             interactor = GetComponentInChildren<PlayerInteractor>();
             shooter = GetComponent<EntityShooter>();
+            hud = GetComponentInChildren<PlayerHUD>();
 
             input.Enable();
         }
