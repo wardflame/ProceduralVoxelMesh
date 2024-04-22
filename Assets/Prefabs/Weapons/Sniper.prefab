@@ -322,7 +322,7 @@ MonoBehaviour:
   firePoint: {fileID: 4090777866961479825}
   magazine: {fileID: 4597092707727392852}
   receiver: {fileID: 3255417961821005903}
-  fireFX: {fileID: 1600736708626342232}
+  fireFX: {fileID: 1600693418725491320}
 --- !u!114 &3255417961821005903
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -555,6 +555,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 108093356993736914, guid: f913bc3b5f93c1d4cac760813a9a6bf1,
+        type: 3}
+      propertyPath: m_Intensity
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 198583182404093188, guid: f913bc3b5f93c1d4cac760813a9a6bf1,
         type: 3}
       propertyPath: playOnAwake
@@ -578,17 +583,50 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1424951578640000, guid: f913bc3b5f93c1d4cac760813a9a6bf1,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2020586678839730261}
   m_SourcePrefab: {fileID: 100100000, guid: f913bc3b5f93c1d4cac760813a9a6bf1, type: 3}
+--- !u!1 &1509343079474854396 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1424951578640000, guid: f913bc3b5f93c1d4cac760813a9a6bf1,
+    type: 3}
+  m_PrefabInstance: {fileID: 1510760264677476220}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &2020586678839730261
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1509343079474854396}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 474bcb49853aa07438625e644c072ee6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Version: 3
+  m_UsePipelineSettings: 1
+  m_AdditionalLightsShadowResolutionTier: 2
+  m_LightLayerMask: 1
+  m_RenderingLayers: 1
+  m_CustomShadowLayers: 0
+  m_ShadowLayerMask: 1
+  m_ShadowRenderingLayers: 1
+  m_LightCookieSize: {x: 1, y: 1}
+  m_LightCookieOffset: {x: 0, y: 0}
+  m_SoftShadowQuality: 0
 --- !u!4 &1511154740814393492 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4502835693877224, guid: f913bc3b5f93c1d4cac760813a9a6bf1,
     type: 3}
   m_PrefabInstance: {fileID: 1510760264677476220}
   m_PrefabAsset: {fileID: 0}
---- !u!198 &1600736708626342232 stripped
+--- !u!198 &1600693418725491320 stripped
 ParticleSystem:
-  m_CorrespondingSourceObject: {fileID: 198644345807152676, guid: f913bc3b5f93c1d4cac760813a9a6bf1,
+  m_CorrespondingSourceObject: {fileID: 198583182404093188, guid: f913bc3b5f93c1d4cac760813a9a6bf1,
     type: 3}
   m_PrefabInstance: {fileID: 1510760264677476220}
   m_PrefabAsset: {fileID: 0}

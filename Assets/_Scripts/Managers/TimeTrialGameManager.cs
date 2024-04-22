@@ -87,7 +87,7 @@ namespace Essence
 
             if (time <= trialTimer * .25f)
             {
-                timerStr.Insert(0, "<color=red>");
+                timerStr = timerStr.Insert(0, "<color=red>");
                 timerStr += "</color>";
             }
 

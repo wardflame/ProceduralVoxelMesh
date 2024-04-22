@@ -275,6 +275,15 @@ public partial class @EssenceInput: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""QuitToMenu"",
+                    ""type"": ""Button"",
+                    ""id"": ""e97a7201-a1e0-4df2-88bc-c3a81b196033"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -286,6 +295,17 @@ public partial class @EssenceInput: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""Interact"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""32b2c9d5-374b-450b-a2ba-06079525cf9a"",
+                    ""path"": ""<Keyboard>/escape"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""QuitToMenu"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -521,6 +541,7 @@ public partial class @EssenceInput: IInputActionCollection2, IDisposable
         // General
         m_General = asset.FindActionMap("General", throwIfNotFound: true);
         m_General_Interact = m_General.FindAction("Interact", throwIfNotFound: true);
+        m_General_QuitToMenu = m_General.FindAction("QuitToMenu", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -736,11 +757,13 @@ public partial class @EssenceInput: IInputActionCollection2, IDisposable
     private readonly InputActionMap m_General;
     private List<IGeneralActions> m_GeneralActionsCallbackInterfaces = new List<IGeneralActions>();
     private readonly InputAction m_General_Interact;
+    private readonly InputAction m_General_QuitToMenu;
     public struct GeneralActions
     {
         private @EssenceInput m_Wrapper;
         public GeneralActions(@EssenceInput wrapper) { m_Wrapper = wrapper; }
         public InputAction @Interact => m_Wrapper.m_General_Interact;
+        public InputAction @QuitToMenu => m_Wrapper.m_General_QuitToMenu;
         public InputActionMap Get() { return m_Wrapper.m_General; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -753,6 +776,9 @@ public partial class @EssenceInput: IInputActionCollection2, IDisposable
             @Interact.started += instance.OnInteract;
             @Interact.performed += instance.OnInteract;
             @Interact.canceled += instance.OnInteract;
+            @QuitToMenu.started += instance.OnQuitToMenu;
+            @QuitToMenu.performed += instance.OnQuitToMenu;
+            @QuitToMenu.canceled += instance.OnQuitToMenu;
         }
 
         private void UnregisterCallbacks(IGeneralActions instance)
@@ -760,6 +786,9 @@ public partial class @EssenceInput: IInputActionCollection2, IDisposable
             @Interact.started -= instance.OnInteract;
             @Interact.performed -= instance.OnInteract;
             @Interact.canceled -= instance.OnInteract;
+            @QuitToMenu.started -= instance.OnQuitToMenu;
+            @QuitToMenu.performed -= instance.OnQuitToMenu;
+            @QuitToMenu.canceled -= instance.OnQuitToMenu;
         }
 
         public void RemoveCallbacks(IGeneralActions instance)
@@ -857,6 +886,7 @@ public partial class @EssenceInput: IInputActionCollection2, IDisposable
     public interface IGeneralActions
     {
         void OnInteract(InputAction.CallbackContext context);
+        void OnQuitToMenu(InputAction.CallbackContext context);
     }
     public interface IUIActions
     {

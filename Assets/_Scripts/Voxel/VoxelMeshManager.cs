@@ -156,6 +156,7 @@ namespace Essence.Voxel
                         {
                             x = dimensions.x;
                             if (nextVoxel.gridLoc.x <= extent.x) y = dimensions.y;
+                            //y = dimensions.y;
                             //z = dimensions.z;
                         }
                     }

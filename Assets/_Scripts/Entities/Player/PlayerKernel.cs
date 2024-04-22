@@ -2,6 +2,8 @@ using Cinemachine;
 using Essence.Entities.Generic;
 using Essence.UI.Player;
 using UnityEngine;
+using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 
 namespace Essence.Entities.Player
 {
@@ -37,6 +39,13 @@ namespace Essence.Entities.Player
             hud = GetComponentInChildren<PlayerHUD>();
 
             input.Enable();
+
+            input.General.QuitToMenu.performed += ReturnToMainMenu;
+        }
+
+        private void ReturnToMainMenu(InputAction.CallbackContext context)
+        {
+            SceneManager.LoadScene(0);
         }
     }
 }
