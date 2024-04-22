@@ -28,6 +28,8 @@ namespace Essence.Voxel
         [Header("OPTIONS")]
         public bool optimiseMesh;
 
+        public GameObject debrisPrefab;
+
         private float WorldToGrid => 1 / voxelSize;
 
         public System.Action initComplete;

@@ -493,8 +493,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mesh: {fileID: 0}
-  dimensions: {x: 8, y: 8, z: 5}
-  offset: {x: 0, y: 0.25, z: 0}
+  dimensions: {x: 15, y: 8, z: 3}
+  offset: {x: 0, y: 0.125, z: 0}
   voxelSize: 0.25
   vertices: []
   triangles: 
