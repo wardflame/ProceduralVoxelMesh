@@ -1,6 +1,4 @@
 using Essence.Entities.Generic;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace Essence
@@ -18,7 +16,10 @@ namespace Essence
         public Material shotMaterial;
         public Material normalMaterial;
 
-        private bool collapsed;
+        public GameObject arrow;
+        public float floatSpeed;
+
+        private bool disabled;
 
         private MeshRenderer meshRenderer;
 
@@ -35,24 +36,31 @@ namespace Essence
 
         private void Update()
         {
-            if (collapsed)
+            if (disabled)
             {
                 timer += Time.deltaTime;
                 if (timer >= cooldown)
                 {
                     timer = 0;
                     meshRenderer.material = normalMaterial;
-                    collapsed = false;
+                    arrow.SetActive(true);
+                    disabled = false;
                 }
+            }
+            else
+            {
+                float y = Mathf.PingPong(Time.time * floatSpeed, 1) * 2 - 1;
+                arrow.transform.position = new Vector3(transform.position.x, transform.position.y + 2f + y, transform.position.z);
             }
         }
 
         private void OnHit()
         {
-            if (collapsed) return;
+            if (disabled) return;
 
-            collapsed = true;
+            disabled = true;
             meshRenderer.material = shotMaterial;
+            arrow.SetActive(false);
             TargetHit?.Invoke();
         }
     }

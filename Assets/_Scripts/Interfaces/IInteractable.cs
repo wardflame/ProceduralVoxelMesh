@@ -6,6 +6,8 @@ namespace Essence.Interfaces
     {
         public string Prompt { get; }
 
+        public bool CanInteract { get; }
+
         public void OnInteract(GameObject interactor);
     }
 }

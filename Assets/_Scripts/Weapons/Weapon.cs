@@ -22,6 +22,8 @@ namespace Essence.Weapons
 
         public string Prompt => $"Press E to pick up {weaponName}";
 
+        public bool CanInteract => true;
+
         public void OnInteract(GameObject interactor)
         {
             var player = interactor.GetComponent<PlayerInteractor>();

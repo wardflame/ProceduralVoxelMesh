@@ -28,6 +28,8 @@ namespace Essence.Voxel
         [Header("OPTIONS")]
         public bool optimiseMesh;
 
+        [Header("VISUALS")]
+        public Material meshMaterial;
         public GameObject debrisPrefab;
 
         private float WorldToGrid => 1 / voxelSize;
@@ -53,6 +55,8 @@ namespace Essence.Voxel
         {
             mesh = GetComponent<MeshFilter>().mesh;
             mesh.name = "Procedural Voxel Mesh";
+
+            GetComponent<MeshRenderer>().material = meshMaterial;
 
             meshCollider = GetComponent<MeshCollider>();
 
@@ -416,8 +420,6 @@ namespace Essence.Voxel
                 }
             }
 
-            Debug.Log(disabledVoxels.Count);
-
             for (int i = 0; i < disabledVoxels.Count; i++)
             {
                 if (disabledVoxels[i] != null && disabledVoxels[i].rendering)
@@ -426,8 +428,6 @@ namespace Essence.Voxel
                     renderingVoxels--;
                 }
             }
-
-            Debug.Log(renderingVoxels);
 
             RefreshRenderData();
         }
@@ -440,6 +440,22 @@ namespace Essence.Voxel
             CreateOptimisedMeshData();
 
             GenerateMesh();
+        }
+
+        private void OnDrawGizmos()
+        {
+            Vector3 dims = dimensions;
+            dims *= voxelSize;
+
+            Vector3 trans = transform.position;
+            trans.x += dims.x * .5f - voxelHalfSize;
+            trans.y += dims.y * .5f - voxelHalfSize;
+            trans.z += dims.z * .5f - voxelHalfSize;
+
+            trans += offset;
+
+            Gizmos.color = Color.green;
+            Gizmos.DrawWireCube(trans, dims);
         }
     }
 

@@ -19,7 +19,7 @@ namespace Essence.Entities.Player
         private void OnTriggerEnter(Collider other)
         {
             var interactable = other.GetComponent<IInteractable>();
-            if (interactable != null && !other.CompareTag("Player"))
+            if (interactable != null && interactable.CanInteract && !other.CompareTag("Player"))
             {
                 currentInteractable = interactable;
                 kernel.hud.prompt.ShowPrompt(currentInteractable.Prompt);

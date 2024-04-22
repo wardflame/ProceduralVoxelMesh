@@ -1,4 +1,3 @@
-using Essence.Entities;
 using Essence.Entities.Generic;
 using Essence.Voxel;
 using UnityEngine;
