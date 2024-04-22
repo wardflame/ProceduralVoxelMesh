@@ -1,7 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using Unity.Burst;
-using Unity.Jobs;
 using UnityEngine;
 
 namespace Essence.Voxel

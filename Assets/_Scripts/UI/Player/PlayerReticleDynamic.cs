@@ -1,4 +1,3 @@
-using Essence.Weapons;
 using UnityEngine;
 using UnityEngine.UI;
 

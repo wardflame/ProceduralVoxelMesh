@@ -1,13 +1,12 @@
 using Essence.Weapons;
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace Essence.Entities.Generic
 {
     public class EntityShooter : MonoBehaviour
     {
+        public EntityKernel kernel;
+
         public Transform handSlot;
 
         public GameObject currentWeaponGOB;
@@ -17,6 +16,31 @@ namespace Essence.Entities.Generic
         private GameObject[] idleWeapons = new GameObject[3];
 
         public Transform[] idleSlots = new Transform[3];
+
+        protected bool canFire;
+        protected float timer;
+
+        private void Start()
+        {
+            kernel = GetComponent<EntityKernel>();
+            if (currentWeaponGOB != null) currentWeapon = currentWeaponGOB.GetComponent<Weapon>();
+        }
+
+        protected virtual void Update()
+        {
+            if (canFire)
+            {
+                if (timer <= 0)
+                {
+                    currentWeapon.FireWeapon();
+                    timer = currentWeapon.receiver.cycleRate;
+                    kernel.animator.SetTrigger("Fire");
+                }
+            }
+
+            timer -= Time.deltaTime;
+            if (timer < 0) timer = 0;
+        }
 
         public void FireWeapon()
         {
@@ -44,15 +68,16 @@ namespace Essence.Entities.Generic
             var prevGOB = currentWeaponGOB;
 
             currentWeapon = null;
+            currentWeaponGOB = null;
+            idleWeapons[(int)type] = null;
 
             currentWeaponGOB = idleGOB;
-            idleWeapons[(int)type] = null;
             if (currentWeaponGOB != null)
             {
                 PlaceWeaponInHand(currentWeaponGOB);
                 currentWeapon = currentWeaponGOB.GetComponent<Weapon>();
             }
-            
+
             if (prevGOB != null)
             {
                 PlaceWeaponInSlot(prevGOB, (int)prevGOB.GetComponent<Weapon>().type);

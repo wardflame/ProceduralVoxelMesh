@@ -1,6 +1,5 @@
 using Cinemachine;
 using Essence.Entities.Generic;
-using Essence.Weapons;
 using UnityEngine;
 
 namespace Essence.Entities.Player
@@ -11,8 +10,6 @@ namespace Essence.Entities.Player
 
         public Camera cameraMain;
         public CinemachineVirtualCamera cameraCMV;
-
-        public Animator animator;
         public CharacterController controller;
 
         public PlayerMovement movement;

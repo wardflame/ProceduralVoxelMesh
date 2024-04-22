@@ -1,22 +1,31 @@
 using Essence.Entities.Generic;
 using Essence.Weapons;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 using UnityEngine.InputSystem;
 
 namespace Essence.Entities.Player
 {
     public class PlayerShooter : EntityShooter
     {
-        public PlayerKernel kernel;
+        public PlayerKernel playerKernel;
 
         private void Awake()
         {
-            kernel = GetComponent<PlayerKernel>();
-            kernel.input.Combat.PrimarySlot.performed += OnPrimarySlotPerformed;
-            kernel.input.Combat.SecondarySlot.performed += OnSecondarySlotPerformed;
-            kernel.input.Combat.TertiarySlot.performed += OnTertiarySlotPerformed;
+            playerKernel = GetComponent<PlayerKernel>();
+            playerKernel.input.Combat.PrimarySlot.performed += OnPrimarySlotPerformed;
+            playerKernel.input.Combat.SecondarySlot.performed += OnSecondarySlotPerformed;
+            playerKernel.input.Combat.TertiarySlot.performed += OnTertiarySlotPerformed;
+            playerKernel.input.Combat.Fire.performed += OnFirePerformed;
+            playerKernel.input.Combat.Fire.canceled += OnFireCanceled;
+        }
+
+        private void OnFirePerformed(InputAction.CallbackContext context)
+        {
+            if (currentWeapon) canFire = true;
+        }
+
+        private void OnFireCanceled(InputAction.CallbackContext context)
+        {
+            canFire = false;
         }
 
         private void OnPrimarySlotPerformed(InputAction.CallbackContext context)

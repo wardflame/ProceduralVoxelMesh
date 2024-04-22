@@ -50,7 +50,7 @@ MonoBehaviour:
   impaceForce: 10
   velocity: 600
   lifetime: 1
-  penetrativePower: 1
+  penetrativePower: 2
 --- !u!1 &6215910417208996513
 GameObject:
   m_ObjectHideFlags: 0

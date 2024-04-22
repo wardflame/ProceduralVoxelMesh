@@ -1,6 +1,5 @@
 using Essence.Entities;
 using Essence.Voxel;
-using System.Collections;
 using UnityEngine;
 
 namespace Essence.Weapons
@@ -42,8 +41,7 @@ namespace Essence.Weapons
 
         private void FixedUpdate()
         {
-            //if (!hasHit)
-                MoveProjectile();
+            if (!hasHit) MoveProjectile();
         }
 
         private void MoveProjectile()
@@ -62,11 +60,12 @@ namespace Essence.Weapons
                 {
                     Debug.Log("HIT CURRENT!");
                     OnHit(previousHit);
-                    
+
                     objectsHit++;
 
-                    if (objectsHit > penetrativePower)
+                    if (objectsHit >= penetrativePower)
                     {
+                        hasHit = true;
                         Destroy(gameObject, .025f);
                         return;
                     }
@@ -82,8 +81,9 @@ namespace Essence.Weapons
 
                 objectsHit++;
 
-                if (objectsHit > penetrativePower)
+                if (objectsHit >= penetrativePower)
                 {
+                    hasHit = true;
                     Destroy(gameObject, .025f);
                     return;
                 }
@@ -109,8 +109,6 @@ namespace Essence.Weapons
         {
             transform.position = hit.point;
 
-            hasHit = true;
-
             switch (hit.collider.tag)
             {
                 case "Voxel":
@@ -120,7 +118,7 @@ namespace Essence.Weapons
                     break;
 
                 case "Entity":
-                    EntityKernel entity = hit.collider.gameObject.GetComponentInParent<EntityKernel>();
+                    EntityKernel entity = hit.collider.gameObject.GetComponent<EntityKernel>();
                     if (entity) entity.Health.DamageHealth(damage);
 
                     break;
@@ -130,7 +128,7 @@ namespace Essence.Weapons
                     Destroy(gameObject, .025f);
                     break;
             }
-            
+
             // FX COROUTINE
         }
     }

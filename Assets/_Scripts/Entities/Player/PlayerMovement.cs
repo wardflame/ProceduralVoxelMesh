@@ -1,4 +1,3 @@
-using Codice.Client.BaseCommands.Triggers;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -61,7 +60,7 @@ namespace Essence.Entities.Player
             {
                 currentSpeed = Vector3.SmoothDamp(currentSpeed, Vector3.zero, ref velocity, deceleration);
             }
-            
+
             controller.SimpleMove(currentSpeed);
 
             var cSpeed = input;
