@@ -1,10 +1,11 @@
 using Cinemachine;
+using Essence.Entities.Generic;
 using Essence.Weapons;
 using UnityEngine;
 
 namespace Essence.Entities.Player
 {
-    public class PlayerKernel : MonoBehaviour
+    public class PlayerKernel : EntityKernel
     {
         public EssenceInput input;
 
@@ -18,7 +19,9 @@ namespace Essence.Entities.Player
         public PlayerLook look;
         public PlayerAimTarget aimTarget;
 
-        public Weapon currentWeapon;
+        public EntityShooter shooter;
+
+        public PlayerInteractor interactor;
 
         private void Awake()
         {
@@ -27,9 +30,10 @@ namespace Essence.Entities.Player
             movement = GetComponent<PlayerMovement>();
             look = GetComponent<PlayerLook>();
             aimTarget = GetComponent<PlayerAimTarget>();
-            currentWeapon = GetComponentInChildren<Weapon>();
             animator = GetComponentInChildren<Animator>();
             controller = GetComponent<CharacterController>();
+            interactor = GetComponentInChildren<PlayerInteractor>();
+            shooter = GetComponent<EntityShooter>();
 
             input.Enable();
         }

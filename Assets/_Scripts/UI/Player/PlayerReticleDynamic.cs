@@ -1,3 +1,4 @@
+using Essence.Weapons;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -9,7 +10,6 @@ namespace Essence.UI.Player
 
         private Image sprite;
         private RectTransform rectTransform;
-        private Transform firePoint => hud.player.currentWeapon.firePoint;
 
         private void Awake()
         {
@@ -22,6 +22,12 @@ namespace Essence.UI.Player
         }
 
         private void FixedUpdate()
+        {
+            if (hud.player.shooter.currentWeapon != null) FindPointForReticle(hud.player.shooter.currentWeapon.firePoint);
+            else rectTransform.anchoredPosition = Vector3.zero;
+        }
+
+        private void FindPointForReticle(Transform firePoint)
         {
             Ray firepointRay = new Ray
                 (
@@ -41,9 +47,6 @@ namespace Essence.UI.Player
             {
                 screenPoint = hud.player.cameraMain.WorldToScreenPoint(firepointRay.origin + firepointRay.direction * 200f);
             }
-
-            /*screenPoint = hud.player.cameraMain.WorldToScreenPoint(hud.player.aimTarget.targetTransform.position);
-            screenPoint.z = 0;*/
 
             if (RectTransformUtility.ScreenPointToLocalPointInRectangle(hud.rectTransform, screenPoint, hud.player.cameraMain, out Vector2 rectPoint))
             {

@@ -6,6 +6,6 @@ namespace Essence.Interfaces
 {
     public interface IInteractable
     {
-        public void OnInteract();
+        public void OnInteract(GameObject interactor);
     }
 }
