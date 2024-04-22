@@ -149,7 +149,8 @@ namespace Essence.Voxel
                         else
                         {
                             x = dimensions.x;
-                            if (nextVoxel.gridLoc.x <= extent.x) y = dimensions.y;
+                            y = dimensions.y;
+                            z = dimensions.z;
                         }
                     }
                 }
@@ -363,7 +364,10 @@ namespace Essence.Voxel
             Voxel target = LocateVoxel(worldPosition);
             target.rendering = false;
 
-            List<Voxel> disabledVoxels = new();
+            List<Voxel> disabledVoxels = new()
+            {
+                target
+            };
             disabledVoxels.AddRange(target.neighbours);
 
             int vCount;
