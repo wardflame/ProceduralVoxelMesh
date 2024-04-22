@@ -151,8 +151,8 @@ namespace Essence.Voxel
                         else
                         {
                             x = dimensions.x;
-                            y = dimensions.y;
-                            z = dimensions.z;
+                            if (nextVoxel.gridLoc.x <= extent.x) y = dimensions.y;
+                            //z = dimensions.z;
                         }
                     }
                 }
@@ -286,14 +286,16 @@ namespace Essence.Voxel
 
         private void CreateOptimisedMeshData()
         {
-            int voxelsRendered = 0;
+            int processedVoxels = 0;
             List<Voxel> invalidVoxels = new();
 
-            while (voxelsRendered < renderingVoxels)
+            while (processedVoxels < renderingVoxels)
             {
-                OptimiseMesh(ref voxelsRendered, ref invalidVoxels);
+                OptimiseMesh(ref processedVoxels, ref invalidVoxels);
                 if (renderingVoxels == voxels.Count() || invalidVoxels.Count == renderingVoxels) break;
             }
+
+            renderingVoxels = processedVoxels;
         }
 
         private void SupplyFaces()
@@ -365,31 +367,67 @@ namespace Essence.Voxel
         {
             Voxel target = LocateVoxel(worldPosition);
             target.rendering = false;
+            renderingVoxels--;
 
-            List<Voxel> disabledVoxels = new()
-            {
-                target
-            };
-            disabledVoxels.AddRange(target.neighbours);
+            List<Voxel> disabledVoxels = new();
 
-            int vCount;
-            int prevAm = 0;
-            for (int i = 0; i < layerAmount; ++i)
+            for (int i = 0; i <= layerAmount; i++)
             {
-                for (vCount = 0 + prevAm; vCount < disabledVoxels.Count; vCount++)
+                Voxel newTarget = GetVoxel(target.gridLoc.x - i, target.gridLoc.y, target.gridLoc.z);
+                if (newTarget != null && newTarget.rendering)
                 {
-                    List<Voxel> newL = new();
-                    if (disabledVoxels[vCount] != null) newL.AddRange(disabledVoxels[vCount].neighbours);
-                    prevAm = newL.Count;
+                    disabledVoxels.Add(newTarget);
+                    disabledVoxels.AddRange(newTarget.neighbours);
+                }
+
+                newTarget = GetVoxel(target.gridLoc.x + i, target.gridLoc.y, target.gridLoc.z);
+                if (newTarget != null)
+                {
+                    disabledVoxels.Add(newTarget);
+                    disabledVoxels.AddRange(newTarget.neighbours);
+                }
+
+                newTarget = GetVoxel(target.gridLoc.x, target.gridLoc.y + i, target.gridLoc.z);
+                if (newTarget != null)
+                {
+                    disabledVoxels.Add(newTarget);
+                    disabledVoxels.AddRange(newTarget.neighbours);
+                }
+
+                newTarget = GetVoxel(target.gridLoc.x - i, target.gridLoc.y - i, target.gridLoc.z);
+                if (newTarget != null)
+                {
+                    disabledVoxels.Add(newTarget);
+                    disabledVoxels.AddRange(newTarget.neighbours);
+                }
+
+                newTarget = GetVoxel(target.gridLoc.x - i, target.gridLoc.y, target.gridLoc.z + i);
+                if (newTarget != null)
+                {
+                    disabledVoxels.Add(newTarget);
+                    disabledVoxels.AddRange(newTarget.neighbours);
+                }
+
+                newTarget = GetVoxel(target.gridLoc.x - i, target.gridLoc.y, target.gridLoc.z - i);
+                if (newTarget != null)
+                {
+                    disabledVoxels.Add(newTarget);
+                    disabledVoxels.AddRange(newTarget.neighbours);
                 }
             }
 
+            Debug.Log(disabledVoxels.Count);
+
             for (int i = 0; i < disabledVoxels.Count; i++)
             {
-                if (disabledVoxels[i] != null) disabledVoxels[i].rendering = false;
+                if (disabledVoxels[i] != null && disabledVoxels[i].rendering)
+                {
+                    disabledVoxels[i].rendering = false;
+                    renderingVoxels--;
+                }
             }
 
-            renderingVoxels -= disabledVoxels.Count;
+            Debug.Log(renderingVoxels);
 
             RefreshRenderData();
         }

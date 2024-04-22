@@ -57,7 +57,7 @@ namespace Essence.Weapons
             {
                 if (RaycastBetweenVectors(previousPosition, currentPosition, out RaycastHit previousHit))
                 {
-                    Debug.Log("HIT CURRENT!");
+                    //Debug.Log("HIT CURRENT!");
                     OnHit(previousHit);
 
                     objectsHit++;
@@ -75,7 +75,7 @@ namespace Essence.Weapons
 
             if (RaycastBetweenVectors(previousPosition, currentPosition, out RaycastHit currentHit))
             {
-                Debug.Log("HIT PREVIOUS!");
+                //Debug.Log("HIT PREVIOUS!");
                 OnHit(currentHit);
 
                 objectsHit++;

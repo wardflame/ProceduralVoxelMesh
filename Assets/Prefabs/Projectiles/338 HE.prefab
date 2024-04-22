@@ -48,8 +48,8 @@ MonoBehaviour:
   damage: 2
   velocity: 750
   lifetime: 2
-  penetrativePower: 2
-  destructivePower: 3
+  penetrativePower: 1
+  destructivePower: 1
 --- !u!1 &6215910417208996513
 GameObject:
   m_ObjectHideFlags: 0
