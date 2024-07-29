@@ -2709,7 +2709,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'SID: 1543493'
+  m_text: Z. A. Foroozan
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 2b87fa35f0466a1468fcec5b22141c8f, type: 2}
   m_sharedMaterial: {fileID: 4981925870495230094, guid: 2b87fa35f0466a1468fcec5b22141c8f,
